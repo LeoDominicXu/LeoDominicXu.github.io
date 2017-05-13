@@ -1,0 +1,771 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Redis 的一些理解 | Leo Dominic</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Leo Dominic">
+    
+
+    
+    <meta name="description" content="相信每一个工程师对redis并不陌生，通常可作为缓存,持久化Key-Value数据库,消息队列等解决方案。朕最近对这个也挺感兴趣的，所以就看看了，本文章主要三个部分：数据结构与对象，数据库实现（包括单机，集群，docker集群），使用场景。下面分别介绍。 第一部分 数据结构与对象第一章 数据结构地球人都知道redis有五种数据类型：字符串(string)，列表(list)，哈希(hash)，集合(">
+<meta name="keywords" content="redis,SDS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis 的一些理解">
+<meta property="og:url" content="http://yoursite.com/2017/05/01/redis-concept/index.html">
+<meta property="og:site_name" content="Leo Dominic">
+<meta property="og:description" content="相信每一个工程师对redis并不陌生，通常可作为缓存,持久化Key-Value数据库,消息队列等解决方案。朕最近对这个也挺感兴趣的，所以就看看了，本文章主要三个部分：数据结构与对象，数据库实现（包括单机，集群，docker集群），使用场景。下面分别介绍。 第一部分 数据结构与对象第一章 数据结构地球人都知道redis有五种数据类型：字符串(string)，列表(list)，哈希(hash)，集合(">
+<meta property="og:updated_time" content="2017-05-13T04:58:43.944Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Redis 的一些理解">
+<meta name="twitter:description" content="相信每一个工程师对redis并不陌生，通常可作为缓存,持久化Key-Value数据库,消息队列等解决方案。朕最近对这个也挺感兴趣的，所以就看看了，本文章主要三个部分：数据结构与对象，数据库实现（包括单机，集群，docker集群），使用场景。下面分别介绍。 第一部分 数据结构与对象第一章 数据结构地球人都知道redis有五种数据类型：字符串(string)，列表(list)，哈希(hash)，集合(">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Leo Dominic" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Leo Dominic" title="Leo Dominic"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Leo Dominic">Leo Dominic</a></h1>
+				<h2 class="blog-motto">愿我出走半生，归来仍是少年</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+						<li><a href="/tags">Tag</a></li>
+					
+						<li><a href="/categories">Categories</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/05/01/redis-concept/" title="Redis 的一些理解" itemprop="url">Redis 的一些理解</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Leo Dominic" target="_blank" itemprop="author">Leo Dominic</a>
+		
+  <p class="article-time">
+    <time datetime="2017-05-01T02:07:37.000Z" itemprop="datePublished"> 发表于 2017-05-01</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#第一部分-数据结构与对象"><span class="toc-number">1.</span> <span class="toc-text">第一部分 数据结构与对象</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#第一章-数据结构"><span class="toc-number">1.1.</span> <span class="toc-text">第一章 数据结构</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1、字符串"><span class="toc-number">1.1.1.</span> <span class="toc-text">1、字符串</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2、链表"><span class="toc-number">1.1.2.</span> <span class="toc-text">2、链表</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#链表节点"><span class="toc-number">1.1.2.1.</span> <span class="toc-text">链表节点</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#链表操作结构"><span class="toc-number">1.1.2.2.</span> <span class="toc-text">链表操作结构</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3、字典"><span class="toc-number">1.1.3.</span> <span class="toc-text">3、字典</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#哈希表"><span class="toc-number">1.1.3.1.</span> <span class="toc-text">哈希表</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#字典"><span class="toc-number">1.1.3.2.</span> <span class="toc-text">字典</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#重建哈希"><span class="toc-number">1.1.3.3.</span> <span class="toc-text">重建哈希</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4、跳跃表"><span class="toc-number">1.1.4.</span> <span class="toc-text">4、跳跃表</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5、整数集合"><span class="toc-number">1.1.5.</span> <span class="toc-text">5、整数集合</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#注意"><span class="toc-number">1.1.5.1.</span> <span class="toc-text">注意</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#整数集合的升级"><span class="toc-number">1.1.5.2.</span> <span class="toc-text">整数集合的升级</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6、压缩列表"><span class="toc-number">1.1.6.</span> <span class="toc-text">6、压缩列表</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#压缩列表的结构"><span class="toc-number">1.1.6.1.</span> <span class="toc-text">压缩列表的结构</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#压缩列表的组成成分详细说明"><span class="toc-number">1.1.6.2.</span> <span class="toc-text">压缩列表的组成成分详细说明</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#压缩列表的节点结构"><span class="toc-number">1.1.6.3.</span> <span class="toc-text">压缩列表的节点结构</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#previous-entry-length"><span class="toc-number">1.1.6.3.1.</span> <span class="toc-text">previous_entry_length</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#encoding"><span class="toc-number">1.1.6.3.2.</span> <span class="toc-text">encoding</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#content"><span class="toc-number">1.1.6.3.3.</span> <span class="toc-text">content</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#第二章-对象"><span class="toc-number">1.2.</span> <span class="toc-text">第二章 对象</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1、字符串对象"><span class="toc-number">1.2.1.</span> <span class="toc-text">1、字符串对象</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2、列表对象"><span class="toc-number">1.2.2.</span> <span class="toc-text">2、列表对象</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3、哈希对象"><span class="toc-number">1.2.3.</span> <span class="toc-text">3、哈希对象</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4、集合对象"><span class="toc-number">1.2.4.</span> <span class="toc-text">4、集合对象</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5、有序集合对象"><span class="toc-number">1.2.5.</span> <span class="toc-text">5、有序集合对象</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6、对象相关"><span class="toc-number">1.2.6.</span> <span class="toc-text">6、对象相关</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#第二部分-数据库实现"><span class="toc-number">2.</span> <span class="toc-text">第二部分 数据库实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#第三章-过期时间与数据库持久化"><span class="toc-number">2.1.</span> <span class="toc-text">第三章 过期时间与数据库持久化</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1、设置过期时间"><span class="toc-number">2.1.1.</span> <span class="toc-text">1、设置过期时间</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2、过期键删除策略"><span class="toc-number">2.1.2.</span> <span class="toc-text">2、过期键删除策略</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3、生成RDB文件"><span class="toc-number">2.1.3.</span> <span class="toc-text">3、生成RDB文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4、载入RDB文件"><span class="toc-number">2.1.4.</span> <span class="toc-text">4、载入RDB文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5、AOF"><span class="toc-number">2.1.5.</span> <span class="toc-text">5、AOF</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6、复制"><span class="toc-number">2.1.6.</span> <span class="toc-text">6、复制</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#7、数据库通知"><span class="toc-number">2.1.7.</span> <span class="toc-text">7、数据库通知</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#8、数据库持久化"><span class="toc-number">2.1.8.</span> <span class="toc-text">8、数据库持久化</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#9、客户端"><span class="toc-number">2.1.9.</span> <span class="toc-text">9、客户端</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#第四章-集群"><span class="toc-number">2.2.</span> <span class="toc-text">第四章 集群</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1、复制"><span class="toc-number">2.2.1.</span> <span class="toc-text">1、复制</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#复制的步骤："><span class="toc-number">2.2.1.1.</span> <span class="toc-text">复制的步骤：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#心跳检测："><span class="toc-number">2.2.1.2.</span> <span class="toc-text">心跳检测：</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2、Sentinel"><span class="toc-number">2.2.2.</span> <span class="toc-text">2、Sentinel</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3、集群"><span class="toc-number">2.2.3.</span> <span class="toc-text">3、集群</span></a></li></ol></li></ol></li></ol>
+		
+		</div>
+		
+		<p>相信每一个工程师对redis并不陌生，通常可作为缓存,持久化Key-Value数据库,消息队列等解决方案。朕最近对这个也挺感兴趣的，所以就看看了，本文章主要三个部分：数据结构与对象，数据库实现（包括单机，集群，docker集群），使用场景。下面分别介绍。</p>
+<h2 id="第一部分-数据结构与对象"><a href="#第一部分-数据结构与对象" class="headerlink" title="第一部分 数据结构与对象"></a>第一部分 数据结构与对象</h2><h3 id="第一章-数据结构"><a href="#第一章-数据结构" class="headerlink" title="第一章 数据结构"></a>第一章 数据结构</h3><p>地球人都知道redis有五种数据类型：字符串(string)，列表(list)，哈希(hash)，集合(set)，有序集合(zset)。我们可以用<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:30001&gt; <span class="built_in">type</span> key</div><div class="line">string</div></pre></td></tr></table></figure></p>
+<p>来获取key的数据类型，但其实这只是比较高层的数据类型，而非底层数据结构，那我们接下来学习一下redis的底层数据结构，redis主要包括了六大类数据结构字符串，链表，字典，跳跃表，整数集合，压缩列表。</p>
+<h4 id="1、字符串"><a href="#1、字符串" class="headerlink" title="1、字符串"></a>1、字符串</h4><p>大家都知道redis是用C写的程序，我们知道C中字符串其实就是一个char数组以”\0”结束便是一个字符串了，但redis类似于模仿Java Bean一样定义了一个数据结构。这就是redis的字符串神器SDS（一看名字就很高端，其实很简单）。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">struct sdshdr&#123;</div><div class="line">  int len;<span class="comment">#记录buf数组中已经使用字节的数量</span></div><div class="line">  int free;<span class="comment">#记录buf数组中空闲字节的数量</span></div><div class="line">  char buf[];<span class="comment">#和c一样保存字符串啦</span></div><div class="line">&#125;；</div></pre></td></tr></table></figure></p>
+<p>看出与C的不同了吧，它有什么好处呢？</p>
+<ol>
+<li>获取字符串长度变得so easy了。</li>
+<li>因为空间容量是已知的，修改字符串就不会缓冲区溢出啦。</li>
+<li>减少内存空间重分配的次数（这个策略是：a、初始设置string值是string的长度为len-1，为什么减一就不用解释了吧；b、然后修改字符串并且长度大于当前len需要扩展空间的时候就会进行空间预分配，这时如果len<1m那么新len =="" len="" +="" 1byte，如果len="">=1m那么新len = len + 1m + 1byte；c、如果修改字符串，当长度不需要那么长时，并不回收空间，而是增大free值。）</1m那么新len></li>
+</ol>
+<h4 id="2、链表"><a href="#2、链表" class="headerlink" title="2、链表"></a>2、链表</h4><p>链表很简单，就是我们熟知的链表，先定义一个节点数据结构，再定义数据结构来对链表操作。</p>
+<h5 id="链表节点"><a href="#链表节点" class="headerlink" title="链表节点"></a>链表节点</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">typedef struct listNode&#123;</div><div class="line">  struct listNode *prev;<span class="comment">#前置节点</span></div><div class="line">  struct listNode *next;<span class="comment">#后置节点</span></div><div class="line">  void *value;<span class="comment">#节点值</span></div><div class="line">&#125;listNode；</div></pre></td></tr></table></figure>
+<h5 id="链表操作结构"><a href="#链表操作结构" class="headerlink" title="链表操作结构"></a>链表操作结构</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">typedef struct listNode&#123;</div><div class="line">  listNode *head;<span class="comment">#头节点</span></div><div class="line">  listNode *tail;<span class="comment">#尾节点</span></div><div class="line">  unsigned long len;<span class="comment">#链表节点数</span></div><div class="line">  void *(*dup)(void *ptr)<span class="comment">#节点值复制函数</span></div><div class="line">  void (*free)(void *ptr);<span class="comment">#节点值释放函数</span></div><div class="line">  int (*match)(void *ptr, void *key);<span class="comment">#节点值对比函数</span></div><div class="line">&#125;listNode；</div></pre></td></tr></table></figure>
+<h4 id="3、字典"><a href="#3、字典" class="headerlink" title="3、字典"></a>3、字典</h4><p>字典又叫符号表，关联数组，映射表。Redis的字典就是用哈希表实现的。一个哈希表可以有多个哈希表节点，但是每个哈希表节点就保存了字典中的一个键值对。下面看看哈希表的结构定义：</p>
+<h5 id="哈希表"><a href="#哈希表" class="headerlink" title="哈希表"></a>哈希表</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">typedef struct dictht&#123;</div><div class="line">  dictEntry **table;<span class="comment">#哈希表数组</span></div><div class="line">  unsigned long size;<span class="comment">#哈希表大小</span></div><div class="line">  unsigned long sizemask;<span class="comment">#哈希表大小掩码，用于计算索引值 总是等于size-1</span></div><div class="line">  unsigned long used;<span class="comment">#该哈希表中已有节点的数量</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里需要注意的是size与used的区别，size指的是table的大小，而used表示的是哈希表节点已有的数量(当used/size&gt;=1时，会触发重建哈希)，下面看看哈希表节点的数据结构：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">typedef struct dictEntry&#123;</div><div class="line">  void *key;<span class="comment">#键</span></div><div class="line">  union&#123;</div><div class="line">    void *val;</div><div class="line">    uint64_t u64;</div><div class="line">    int64_t s64;    </div><div class="line">  &#125; v;<span class="comment">#值</span></div><div class="line">  struct dictEntry *next;<span class="comment">#下一个哈希表节点，形成链表</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h5 id="字典"><a href="#字典" class="headerlink" title="字典"></a>字典</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">typedef struct dict&#123;</div><div class="line">  dictType *<span class="built_in">type</span>;<span class="comment">#类型特定函数</span></div><div class="line">  void *privdata;<span class="comment">#私有数据</span></div><div class="line">  dictht ht[2];<span class="comment">#哈希表</span></div><div class="line">  int rehashidx;<span class="comment">#rehash索引 没有rehash时值为-1</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里重点是ht属性，有两个哈希表是指当rehash的时候会用第二个哈希表去为第一个重建哈希。而rehashidx记录的重建哈希的进度。   </p>
+<h5 id="重建哈希"><a href="#重建哈希" class="headerlink" title="重建哈希"></a>重建哈希</h5><p>为什么要重建哈希的，总的来说就是因为由于哈希节点越来越多，为了减少键冲突，或者键值对越来越少，不能造一个房子大的箱子就为了装一个鸡蛋吧。所以重建哈希。步骤如下：</p>
+<ol>
+<li>为ht[1]分配空间，大小随操作而定<ul>
+<li>如果执行扩展操作，ht[1]的大小为第一个大于等于ht[0].used<em>2的 2^n(例如：如果ht[0].used = 7，7</em>2=14，那么ht[1]的大小=16)</li>
+<li>如果执行扩展操作，ht[1]的大小为第一个大于等于ht[0].used的 2^n(例如：如果ht[0].used = 7，那么ht[1]的大小=8)</li>
+</ul>
+</li>
+<li>然后将ht[0]全部复制到ht[1]上。</li>
+<li>释放ht[0]，然后将ht[1]设置为ht[0]，并在ht[1]上创建了一个空白哈希表。</li>
+</ol>
+<h4 id="4、跳跃表"><a href="#4、跳跃表" class="headerlink" title="4、跳跃表"></a>4、跳跃表</h4><p>Redis中只有两个地方用到跳跃表，一个是有序集合键，另一个是在集群节点中用作内部数据结构。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">typedef struct zskiplistNode&#123;</div><div class="line">  struct zskiplistNode *backward;<span class="comment">#后退指针</span></div><div class="line">  double score;<span class="comment">#分值</span></div><div class="line">  robj *obj;<span class="comment">#成员对象</span></div><div class="line">  struct zskiplistLevel &#123;</div><div class="line">    struct zskiplistNode *forward;<span class="comment">#前进指针</span></div><div class="line">    unsigned int span;<span class="comment">#跨度</span></div><div class="line">  &#125;level[];</div><div class="line">&#125;zskiplistNode;</div></pre></td></tr></table></figure></p>
+<h4 id="5、整数集合"><a href="#5、整数集合" class="headerlink" title="5、整数集合"></a>5、整数集合</h4><p>整数集合是集合键的底层实现之一，当一个集合只有整数元素，并且集合元素数量不多时就会使用整数集合作为底层实现。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">typedef struct zskiplistNode&#123;</div><div class="line">  uint32_t encoding;<span class="comment">#编码方式</span></div><div class="line">  uint32_t length;<span class="comment">#集合包含的元素数量</span></div><div class="line">  int8_t contents[];<span class="comment">#保存元素的数组</span></div><div class="line">&#125;intset;</div></pre></td></tr></table></figure></p>
+<h5 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h5><p>contents[]的属性声明int8_t但并不代表他就是保存int8_t类型的数组，它保存的类型由encoding决定，而encoding的值有三种值：INSET_ENC_INT16(类型是：int16_t),INSET_ENC_INT32(类型是：int32_t),INSET_ENC_INT16(类型是：int64_t),</p>
+<h5 id="整数集合的升级"><a href="#整数集合的升级" class="headerlink" title="整数集合的升级"></a>整数集合的升级</h5><p>当我们每添加一个新的元素到整数集合里，并且新元素的类型要比整数集合现有所有元素的类型要长时，整数集合需要先进行升级，然后才能将新元素添加到整数集合里面。<br>添加步骤：</p>
+<ol>
+<li>根据新元素的类型，扩展整数集合底层数组的空间大小，并为新元素分配空间。</li>
+<li>将底层数组现有所有的元素都转换为与新元素相同的类型，并将类型装换后的元素放置到正确的位置上，而且在放置元素的过程中需要维持底层数组的有序性不变。</li>
+<li>将新元素添加到底层数组里面  </li>
+</ol>
+<p>注意：整数集合不支持降级，一旦对数组进行了升级，编码便会保持升级后的状态。</p>
+<h4 id="6、压缩列表"><a href="#6、压缩列表" class="headerlink" title="6、压缩列表"></a>6、压缩列表</h4><p>压缩列表是列表键和哈希键的底层实现之一。<br>当一个列表键只包含少量列表项，并且每个列表项要么就是小整数值，要么就是长度比较短的字符串，那么Redis就会使用压缩列表来实现列表键。<br>当一个哈希键只包含少量键值对，并且每个键值对的键和值要么就是小整数值，要么就是长度比较短的字符串，那么Redis就会使用压缩列表来实现哈希键。</p>
+<h5 id="压缩列表的结构"><a href="#压缩列表的结构" class="headerlink" title="压缩列表的结构"></a>压缩列表的结构</h5><table>
+<thead>
+<tr>
+<th>zlbytes</th>
+<th>zltail</th>
+<th>zllen</th>
+<th>entry1</th>
+<th>entry2</th>
+<th>…</th>
+<th>entryN</th>
+<th>zlend</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h5 id="压缩列表的组成成分详细说明"><a href="#压缩列表的组成成分详细说明" class="headerlink" title="压缩列表的组成成分详细说明"></a>压缩列表的组成成分详细说明</h5><table>
+<thead>
+<tr>
+<th>属性</th>
+<th>类型</th>
+<th>长度（字节）</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>zlbytes</td>
+<td>uint32_t</td>
+<td>4</td>
+<td>压缩列表所占字节数，对压缩列表内存重分配或者计算zend的位置时使用</td>
+</tr>
+<tr>
+<td>zltail</td>
+<td>uint32_t</td>
+<td>4</td>
+<td>记录压缩列表尾节点距离起始地址的字节数，即尾节点的位置</td>
+</tr>
+<tr>
+<td>zllen</td>
+<td>uint16_t</td>
+<td>2</td>
+<td>节点数（最大值65535），当大于这个数的时候需要遍历压缩列表      </td>
+</tr>
+<tr>
+<td>entryX</td>
+<td>列表节点</td>
+<td>不定</td>
+<td>压缩列表节点    </td>
+</tr>
+<tr>
+<td>zlend</td>
+<td>uint8_t</td>
+<td>1</td>
+<td>特殊值0XFF（255）标记列表末端</td>
+</tr>
+</tbody>
+</table>
+<h5 id="压缩列表的节点结构"><a href="#压缩列表的节点结构" class="headerlink" title="压缩列表的节点结构"></a>压缩列表的节点结构</h5><table>
+<thead>
+<tr>
+<th>前个字段长度</th>
+<th>编码</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>previous_entry_length</td>
+<td>encoding</td>
+<td>content</td>
+</tr>
+</tbody>
+</table>
+<h6 id="previous-entry-length"><a href="#previous-entry-length" class="headerlink" title="previous_entry_length"></a>previous_entry_length</h6><p>这个字段记录的前一个节点的长度，这个字段占用1个字节或者5个字节。<br>当前一个节点的长度小于254个字节，本字段占用1个字节；<br>当前一个节点的长度大于或等于254个字节，本字段占用5个字节.<br>由于这种特性，修改一个节点数据会导致连锁更新，所有节点都需要重新分配内存空间。<br>通过这个字段和压缩列表的zltail属性可以实现压缩列表的从表尾向表头遍历。</p>
+<h6 id="encoding"><a href="#encoding" class="headerlink" title="encoding"></a>encoding</h6><p>这个字段记录了content属性所保存数据的类型以及长度</p>
+<h6 id="content"><a href="#content" class="headerlink" title="content"></a>content</h6><p>节点值，可以是一个字节数组（字符串）或者整数</p>
+<h3 id="第二章-对象"><a href="#第二章-对象" class="headerlink" title="第二章 对象"></a>第二章 对象</h3><p>我们可以通过object encoding key命令查询对象的编码方式。还有大家要知道一个对象在底层是怎么存储的：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">typedef struct redisObject&#123;</div><div class="line">  unsigned <span class="built_in">type</span>:4;<span class="comment">#类型</span></div><div class="line">  unsigned encoding:4;<span class="comment">#编码</span></div><div class="line">  void *ptr;<span class="comment">#指向具体的实现数据</span></div><div class="line">&#125;robj;</div></pre></td></tr></table></figure></p>
+<h4 id="1、字符串对象"><a href="#1、字符串对象" class="headerlink" title="1、字符串对象"></a>1、字符串对象</h4><p>字符串可以有三种编码方式int,embstr,raw<br>当一个字符串对象是整数值，并且可以用long表示则用int的编码方式；<br>当一个字符串长度小于或等于39字节则用embstr的编码方式；<br>其他情况用raw编码方式。<br>embstr相对于raw的优点是redisObject和sdshdr结构是连续的，内存一起分配也一起释放，但它是只读的，任何embstr的字符串修改后都变成了raw。</p>
+<h4 id="2、列表对象"><a href="#2、列表对象" class="headerlink" title="2、列表对象"></a>2、列表对象</h4><p>列表对象的编码可以是ziplist或者linkedlist。<br>使用ziplist编码的条件是：</p>
+<ol>
+<li>列表保存的所有字符串元素长度小于64字节</li>
+<li>列表对象元素个数小于512个</li>
+</ol>
+<h4 id="3、哈希对象"><a href="#3、哈希对象" class="headerlink" title="3、哈希对象"></a>3、哈希对象</h4><p>哈希对象的编码可以是ziplist和hashtable。<br>当用ziplist作为底层实现时，每当有新的键值对加入哈希对象时，程序会先将键推入压缩列表表尾，再把值推入列表表尾。所以键值对总是挨在一起的。<br>使用ziplist编码的条件是：</p>
+<ol>
+<li>哈希保存的所有键和值字符串元素长度都小于64字节</li>
+<li>哈希对象元素个数小于512个</li>
+</ol>
+<h4 id="4、集合对象"><a href="#4、集合对象" class="headerlink" title="4、集合对象"></a>4、集合对象</h4><p>集合对象的编码可以是intset和hashtable。<br>使用intset编码的条件是：</p>
+<ol>
+<li>集合保存的所有元素都是整数值</li>
+<li>集合对象元素个数小于512个  </li>
+</ol>
+<p>当用hashtable保存集合对象时，哈希表的键保存集合元素，value都被设置为null。</p>
+<h4 id="5、有序集合对象"><a href="#5、有序集合对象" class="headerlink" title="5、有序集合对象"></a>5、有序集合对象</h4><p>有序集合对象的编码可以是ziplist和zskiplist。<br>当用ziplist来保存有序集合对象时，每每都是第一个节点保存元素成员，第二个保存分数。并且在压缩列表内按照从小到大排序。<br>当用zskiplist作为有序集合底层实现时，一个zset包含了一个skiplist和一个dict，如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">typedef struct zset&#123;</div><div class="line">  skiplist *zsl;</div><div class="line">  dict *dict;</div><div class="line">&#125;zset;</div></pre></td></tr></table></figure></p>
+<p>字典的作用是：字典的键保存了元素的成员，值保存了分值，这样用O(1)复杂度就可以获取元素的分值。<br>使用ziplist编码的条件是：</p>
+<ol>
+<li>有序集合保存的所有元素成员长度都小于64字节</li>
+<li>有序集合对象元素个数小于128个</li>
+</ol>
+<h4 id="6、对象相关"><a href="#6、对象相关" class="headerlink" title="6、对象相关"></a>6、对象相关</h4><p>Redis在初始化服务的时候会创建一万个共享对象：0~9999这些对象不用重新创建<br>对象的空转时长（通过lru属性计算）记录了对象最后一次被命令访问的时间，通过下面命令查看空转时长（当前时间减去lru时间计算得出）。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">OBJECT IDLETIME key</div></pre></td></tr></table></figure></p>
+<h2 id="第二部分-数据库实现"><a href="#第二部分-数据库实现" class="headerlink" title="第二部分 数据库实现"></a>第二部分 数据库实现</h2><h3 id="第三章-过期时间与数据库持久化"><a href="#第三章-过期时间与数据库持久化" class="headerlink" title="第三章 过期时间与数据库持久化"></a>第三章 过期时间与数据库持久化</h3><h4 id="1、设置过期时间"><a href="#1、设置过期时间" class="headerlink" title="1、设置过期时间"></a>1、设置过期时间</h4><p>在Redis中有四种设置过期时间的方式  </p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>单位</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>EXPIRE</td>
+<td>秒</td>
+<td>设置生存时间（可以活多久）</td>
+</tr>
+<tr>
+<td>PEXPIRE</td>
+<td>毫秒</td>
+<td>设置生存时间（可以活多久）</td>
+</tr>
+<tr>
+<td>EXPIREAT</td>
+<td>秒</td>
+<td>过期时间戳</td>
+</tr>
+<tr>
+<td>PEXPIREAT</td>
+<td>毫秒</td>
+<td>过期时间戳</td>
+</tr>
+<tr>
+<td>TTL</td>
+<td>KEY</td>
+<td>查看剩余时间 单位 秒</td>
+</tr>
+<tr>
+<td>PRESISIT</td>
+<td>KEY</td>
+<td>移除过期时间</td>
+</tr>
+</tbody>
+</table>
+<p>其实事实上虽说有四个命令，但都是通过换算成PEXPIREAT实现的。<br>redisDb结构的expires字典保存了数据库中所有键的过期时间，我们称这个为过期字典。</p>
+<h4 id="2、过期键删除策略"><a href="#2、过期键删除策略" class="headerlink" title="2、过期键删除策略"></a>2、过期键删除策略</h4><p>Redis服务器采用的是惰性删除和定期删除。<br>惰性删除：指的是程序读取键时，判定键有没有过期，过期则删除。<br>定期删除：每隔一段时间，程序对数据库做一次检查，删除过期键。<br>这里需要注意的是定期检查并不是全盘扫描，而是从一定数量的数据库中取出一定数量的随机键进行检查，并删除过期键。  </p>
+<h4 id="3、生成RDB文件"><a href="#3、生成RDB文件" class="headerlink" title="3、生成RDB文件"></a>3、生成RDB文件</h4><p>在执行SAVE或者BGSAVE命令时候程序会对数据库中的键进行检查，如果过期就不会保存到RDB文件中。</p>
+<h4 id="4、载入RDB文件"><a href="#4、载入RDB文件" class="headerlink" title="4、载入RDB文件"></a>4、载入RDB文件</h4><p>主：载入RDB时，程序会对文件中保存的键进行检查，未过期的载入数据库。<br>从：载入时不检查，所有都载入数据库。因为在进行主从同步的时候，从库数据会被清空，所以过期键载入对从库没有影响。</p>
+<h4 id="5、AOF"><a href="#5、AOF" class="headerlink" title="5、AOF"></a>5、AOF</h4><p>生成aof文件时如果数据库某个键已过期但是没有被惰性删除或者定期删除，那么aof文件不会因为这个键已过期而产生任何影响，当被检查要删除的时候，程序会对aof文件追加一条del命令，显示标识已被删除。而aof重写会忽略已过期的键。</p>
+<h4 id="6、复制"><a href="#6、复制" class="headerlink" title="6、复制"></a>6、复制</h4><p>当服务器运行在复制模式下，从服务器的过期键删除动作由主服务器控制：</p>
+<ol>
+<li>主在删除一个过期键的时候会显式的向所有从服务器发送一个DEL命令</li>
+<li>从库执行客户端读命令时即使碰到过期键也不删除，而是继续返回过期键</li>
+<li>从库只有接收到主库的del命令才会删除过期键。</li>
+</ol>
+<h4 id="7、数据库通知"><a href="#7、数据库通知" class="headerlink" title="7、数据库通知"></a>7、数据库通知</h4><p>redis 2.8以后可以让客户端通过订阅数据库中键的变化，以及命令的执行情况：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379 &gt; SUBSCRIBE __keyspace@0__:message <span class="comment">#对0号库message键监听执行哪些命令</span></div><div class="line">127.0.0.1:6379 &gt; SUBSCRIBE __keyevent@0__:del <span class="comment">#对0号库所有执行del操作的键</span></div></pre></td></tr></table></figure></p>
+<h4 id="8、数据库持久化"><a href="#8、数据库持久化" class="headerlink" title="8、数据库持久化"></a>8、数据库持久化</h4><p>数据库持久化分为RDB和AOF两种方式 ：</p>
+<ol>
+<li><p>RDB就是通过Redis的ServerCron（间隔100毫秒）判断一次是否满足持久化条件，例如：<br>save 900 1<br>save 300 10<br>save 60 10000<br>900秒内数据库修改1次执行BGSAVE<br>300秒内数据库修改10次执行BGSAVE<br>60秒内数据库修改10000次执行BGSAVE<br>redisServer会有dirty和lastsave，dirty记录了上次执行save或者bgsave之后数据库修改的次数，lastsave记录了上次持久化的时间，程序就是检查这两个参数是否达到持久化的条件。</p>
+</li>
+<li><p>AOF文件的写入与同步</p>
+</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>appendsync选项的值</th>
+<th>flushAppendOnlyFile函数的行为</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>alway</td>
+<td>将aof_buf缓冲区所有内容写入并同步到aof</td>
+</tr>
+<tr>
+<td>everysec</td>
+<td>将aof_buf缓冲区所有内容写入到aof，如果上次同步到现在超过1秒，再次对AOF文件进行同步</td>
+</tr>
+<tr>
+<td>no</td>
+<td>将aof_buf缓冲区所有内容写入到aof，但不同步，何时同步由操作系统决定</td>
+</tr>
+</tbody>
+</table>
+<h4 id="9、客户端"><a href="#9、客户端" class="headerlink" title="9、客户端"></a>9、客户端</h4><p>对于每个与服务器连接的客户端，服务器都会为这些客户端建立相应的redis.h/redisClient结构（客户端状态），这个结构保存了当前客户端的状态信息，以及执行相关功能要用道德数据结构。<br>输入缓冲区：客户端发送的命令请求；<br>输出缓冲区：执行客户端命令的回复</p>
+<h3 id="第四章-集群"><a href="#第四章-集群" class="headerlink" title="第四章 集群"></a>第四章 集群</h3><h4 id="1、复制"><a href="#1、复制" class="headerlink" title="1、复制"></a>1、复制</h4><p>Redis的复制包括同步和命令传播：</p>
+<ol>
+<li>同步就是从服务器的数据库状态更新到主服务器的数据库状态。</li>
+<li>命令传播的作用是主服务器数据库状态被修改，导致主从不一致，需要让主从重新一致。</li>
+</ol>
+<p>旧版同步（SYNC）命令过时了不讲，因为存在缺陷：每次执行命令，从服务器都将让主服务器生成RDB文件，并全部读取完成数据库状态，然后再从命令缓冲区读取命令，让主从完成一致。不用说这就像你盖房子，人家让你修改一下你就把房子推了重新盖，极其消耗不必要的资源。<br>新版同步（PSYNC）命令，具有完整同步和部分同步两种模式：</p>
+<ol>
+<li>完整同步用于初次同步，和SYNC一样读取全部RDB文件，以及读取命令缓冲区的命令完成主从一致。</li>
+<li>部分同步用于当从服务器断线后重新连接，符合条件（条件后面说）的话，主服务器将主从连接断开期间主服务器执行的写命令发送给从服务器，从服务器执行命令完成主从一致。</li>
+</ol>
+<p>部分同步的条件：</p>
+<ol>
+<li>主从服务器各自的复制偏移量。</li>
+<li>主服务器的复制积压缓冲区。</li>
+<li>服务器的运行id。</li>
+</ol>
+<p>复制偏移量：是指执行复制的双方都会维护一个复制偏移量，主服务器向从服务器传播N个字节的数据时，便将自己的偏移量加N；从服务器每次从主收到N字节的数据时就将自己的偏移量加N。（如果主从一致，复制偏移量是一样的）<br>复制积压缓冲区：是指主服务器会有一个固定长度的一个队列，如果从服务器执行PSYNC命令时会将自己的复制偏移量offset发送给主服务器，主服务器根据这个决定执行哪种同步方式：</p>
+<ol>
+<li>如果offset偏移量之后的数据仍在复制缓冲区，那么主服务器对从服务器执行部分同步；</li>
+<li>如果offset偏移量之后的数据不在复制缓冲区，那么主服务器对从服务器执行完整同步。</li>
+</ol>
+<p>服务器运行id：不论主从都有自己的运行id，在服务器启动时自动生成，由40个16进制字符组成，当主从初次同步时，主服务器会将自己的运行id传给从服务器保存起来，从服务器断线重连时，从服务器会将自己保存的运行id传给主服务器，主服务器收到id判断是否和自己的运行id一致，如果一致便可以执行部分同步，反之说明从库现在连接的主库不是之前的主库，需要进行完整同步。</p>
+<h5 id="复制的步骤："><a href="#复制的步骤：" class="headerlink" title="复制的步骤："></a>复制的步骤：</h5><ol>
+<li>设置主服务器的地址端口 eg： slaveof 127.0.0.1 6379</li>
+<li>建立套接字连接</li>
+<li>从发送PING命令，主回复PONG命令</li>
+<li>身份验证（需要配置：masterauth选项）</li>
+<li>从向主发送监听端口信息 eg： REPLCONF listening-port 12345</li>
+<li>同步</li>
+<li>命令传播</li>
+</ol>
+<h5 id="心跳检测："><a href="#心跳检测：" class="headerlink" title="心跳检测："></a>心跳检测：</h5><p>在命令传播阶段，从服务器每秒一次向主发送命令：<br>REPLCONF ACK <replication_offset> ##就是发送复制偏移量。作用有三个：</replication_offset></p>
+<ol>
+<li>检查主从网络连接状况（如果lag大于1秒说明主从连接有故障）；</li>
+<li><p>辅助实现min-slaves配置选项</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">min-slaves-to-write 3</div><div class="line">min-slaves-max-lag 10</div><div class="line"><span class="comment">#指：当从服务器少于3个，或者3个服务器的延迟（lag值 可以通过‘info replication’命令获取）主服务器将拒绝写命令。</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>检测命令丢失（如果主传给从的命令在半路丢失，那么重服务器向主发送心态检测携带了复制偏移量，主会发觉从服务器的复制偏移量少于自己的，主就会将复制缓冲区中找到从缺少的数据，然后重新发给从）。</p>
+</li>
+</ol>
+<h4 id="2、Sentinel"><a href="#2、Sentinel" class="headerlink" title="2、Sentinel"></a>2、Sentinel</h4><h4 id="3、集群"><a href="#3、集群" class="headerlink" title="3、集群"></a>3、集群</h4>  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Redis/">Redis</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/redis/">redis</a><a href="/tags/SDS/">SDS</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2017/05/01/redis-concept/" data-title="Redis 的一些理解 | Leo Dominic" data-tsina="1868167451" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2017/04/12/setSSH/"  title="配置SSH连接github">
+ <strong>下一篇：</strong><br/> 
+ <span>配置SSH连接github
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#第一部分-数据结构与对象"><span class="toc-number">1.</span> <span class="toc-text">第一部分 数据结构与对象</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#第一章-数据结构"><span class="toc-number">1.1.</span> <span class="toc-text">第一章 数据结构</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1、字符串"><span class="toc-number">1.1.1.</span> <span class="toc-text">1、字符串</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2、链表"><span class="toc-number">1.1.2.</span> <span class="toc-text">2、链表</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#链表节点"><span class="toc-number">1.1.2.1.</span> <span class="toc-text">链表节点</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#链表操作结构"><span class="toc-number">1.1.2.2.</span> <span class="toc-text">链表操作结构</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3、字典"><span class="toc-number">1.1.3.</span> <span class="toc-text">3、字典</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#哈希表"><span class="toc-number">1.1.3.1.</span> <span class="toc-text">哈希表</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#字典"><span class="toc-number">1.1.3.2.</span> <span class="toc-text">字典</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#重建哈希"><span class="toc-number">1.1.3.3.</span> <span class="toc-text">重建哈希</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4、跳跃表"><span class="toc-number">1.1.4.</span> <span class="toc-text">4、跳跃表</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5、整数集合"><span class="toc-number">1.1.5.</span> <span class="toc-text">5、整数集合</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#注意"><span class="toc-number">1.1.5.1.</span> <span class="toc-text">注意</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#整数集合的升级"><span class="toc-number">1.1.5.2.</span> <span class="toc-text">整数集合的升级</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6、压缩列表"><span class="toc-number">1.1.6.</span> <span class="toc-text">6、压缩列表</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#压缩列表的结构"><span class="toc-number">1.1.6.1.</span> <span class="toc-text">压缩列表的结构</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#压缩列表的组成成分详细说明"><span class="toc-number">1.1.6.2.</span> <span class="toc-text">压缩列表的组成成分详细说明</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#压缩列表的节点结构"><span class="toc-number">1.1.6.3.</span> <span class="toc-text">压缩列表的节点结构</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#previous-entry-length"><span class="toc-number">1.1.6.3.1.</span> <span class="toc-text">previous_entry_length</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#encoding"><span class="toc-number">1.1.6.3.2.</span> <span class="toc-text">encoding</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#content"><span class="toc-number">1.1.6.3.3.</span> <span class="toc-text">content</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#第二章-对象"><span class="toc-number">1.2.</span> <span class="toc-text">第二章 对象</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1、字符串对象"><span class="toc-number">1.2.1.</span> <span class="toc-text">1、字符串对象</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2、列表对象"><span class="toc-number">1.2.2.</span> <span class="toc-text">2、列表对象</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3、哈希对象"><span class="toc-number">1.2.3.</span> <span class="toc-text">3、哈希对象</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4、集合对象"><span class="toc-number">1.2.4.</span> <span class="toc-text">4、集合对象</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5、有序集合对象"><span class="toc-number">1.2.5.</span> <span class="toc-text">5、有序集合对象</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6、对象相关"><span class="toc-number">1.2.6.</span> <span class="toc-text">6、对象相关</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#第二部分-数据库实现"><span class="toc-number">2.</span> <span class="toc-text">第二部分 数据库实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#第三章-过期时间与数据库持久化"><span class="toc-number">2.1.</span> <span class="toc-text">第三章 过期时间与数据库持久化</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1、设置过期时间"><span class="toc-number">2.1.1.</span> <span class="toc-text">1、设置过期时间</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2、过期键删除策略"><span class="toc-number">2.1.2.</span> <span class="toc-text">2、过期键删除策略</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3、生成RDB文件"><span class="toc-number">2.1.3.</span> <span class="toc-text">3、生成RDB文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4、载入RDB文件"><span class="toc-number">2.1.4.</span> <span class="toc-text">4、载入RDB文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5、AOF"><span class="toc-number">2.1.5.</span> <span class="toc-text">5、AOF</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6、复制"><span class="toc-number">2.1.6.</span> <span class="toc-text">6、复制</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#7、数据库通知"><span class="toc-number">2.1.7.</span> <span class="toc-text">7、数据库通知</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#8、数据库持久化"><span class="toc-number">2.1.8.</span> <span class="toc-text">8、数据库持久化</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#9、客户端"><span class="toc-number">2.1.9.</span> <span class="toc-text">9、客户端</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#第四章-集群"><span class="toc-number">2.2.</span> <span class="toc-text">第四章 集群</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1、复制"><span class="toc-number">2.2.1.</span> <span class="toc-text">1、复制</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#复制的步骤："><span class="toc-number">2.2.1.1.</span> <span class="toc-text">复制的步骤：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#心跳检测："><span class="toc-number">2.2.1.2.</span> <span class="toc-text">心跳检测：</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2、Sentinel"><span class="toc-number">2.2.2.</span> <span class="toc-text">2、Sentinel</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3、集群"><span class="toc-number">2.2.3.</span> <span class="toc-text">3、集群</span></a></li></ol></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+  <div class="archiveslist">
+    <p class="asidetitle"><a href="/archives">归档</a></p>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">2</span></li></ul>
+  </div>
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/Hexo/" title="Hexo">Hexo<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Redis/" title="Redis">Redis<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/SSH/" title="SSH">SSH<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/redis/" title="redis">redis<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/SDS/" title="SDS">SDS<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/node/" title="node">node<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/git/" title="git">git<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/npm/" title="npm">npm<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/SSH/" title="SSH">SSH<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/github/" title="github">github<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://www.bridgeli.cn/" target="_blank" title="Denny&#39;s Blog">Denny&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=1868167451&verifier=3c2784f4&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> 人生若只如初见 <br/>
+			I fear that I will always be a lonely number like root three</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/1868167451" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		<a href="https://github.com/LeoDominicXu" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		<a href="http://www.zhihu.com/people/dominic-23" target="_blank" class="icon-zhihu" title="知乎"></a>
+		
+		
+		
+		<a href="mailto:xuzichao1991@163.com" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="Leo Dominic">Leo Dominic</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>
