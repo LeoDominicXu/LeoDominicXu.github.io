@@ -1,0 +1,1339 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Linux性能检查工具 | Leo Dominic</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Leo Dominic">
+    
+
+    
+    <meta name="description" content="Linux性能检查工具一、TopTOP是一个动态显示过程,即可以通过用户按键来不断刷新当前状态.如果在前台执行该命令,它将独占前台,直到用户终止该程序为止.比较准确的说,top命令提供了实时的对系统处理器的状态监视.它将显示系统中CPU最“敏感”的任务列表.该命令可以按CPU使用.内存使用和执行时间对任务进行排序；而且该命令的很多特性都可以通过交互式命令或者在个人定制文件中进行设定.top - 1">
+<meta name="keywords" content="Linux,top,vmstat,sar,iostat,netstat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux性能检查工具">
+<meta property="og:url" content="http://yoursite.com/2017/05/17/linux_command_performance/index.html">
+<meta property="og:site_name" content="Leo Dominic">
+<meta property="og:description" content="Linux性能检查工具一、TopTOP是一个动态显示过程,即可以通过用户按键来不断刷新当前状态.如果在前台执行该命令,它将独占前台,直到用户终止该程序为止.比较准确的说,top命令提供了实时的对系统处理器的状态监视.它将显示系统中CPU最“敏感”的任务列表.该命令可以按CPU使用.内存使用和执行时间对任务进行排序；而且该命令的很多特性都可以通过交互式命令或者在个人定制文件中进行设定.top - 1">
+<meta property="og:updated_time" content="2017-05-18T14:28:13.651Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux性能检查工具">
+<meta name="twitter:description" content="Linux性能检查工具一、TopTOP是一个动态显示过程,即可以通过用户按键来不断刷新当前状态.如果在前台执行该命令,它将独占前台,直到用户终止该程序为止.比较准确的说,top命令提供了实时的对系统处理器的状态监视.它将显示系统中CPU最“敏感”的任务列表.该命令可以按CPU使用.内存使用和执行时间对任务进行排序；而且该命令的很多特性都可以通过交互式命令或者在个人定制文件中进行设定.top - 1">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Leo Dominic" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Leo Dominic" title="Leo Dominic"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Leo Dominic">Leo Dominic</a></h1>
+				<h2 class="blog-motto">愿我出走半生，归来仍是少年</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/categories">Categories</a></li>
+					
+						<li><a href="/tags">Tag</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/05/17/linux_command_performance/" title="Linux性能检查工具" itemprop="url">Linux性能检查工具</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Leo Dominic" target="_blank" itemprop="author">Leo Dominic</a>
+		
+  <p class="article-time">
+    <time datetime="2017-05-17T02:07:37.000Z" itemprop="datePublished"> 发表于 2017-05-17</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Linux性能检查工具"><span class="toc-number">1.</span> <span class="toc-text">Linux性能检查工具</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、Top"><span class="toc-number">1.1.</span> <span class="toc-text">一、Top</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#A-TOP前五行统计信息"><span class="toc-number">1.1.1.</span> <span class="toc-text">A.  TOP前五行统计信息</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-第一行是任务队列信息"><span class="toc-number">1.1.1.1.</span> <span class="toc-text">1. 第一行是任务队列信息</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-第二、三行为进程和CPU的信息"><span class="toc-number">1.1.1.2.</span> <span class="toc-text">2. 第二、三行为进程和CPU的信息</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-第四五行为内存信息。"><span class="toc-number">1.1.1.3.</span> <span class="toc-text">3. 第四五行为内存信息。</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#B-进程信息"><span class="toc-number">1.1.1.4.</span> <span class="toc-text">B.  进程信息</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、vmstat"><span class="toc-number">1.2.</span> <span class="toc-text">二、vmstat</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1、r"><span class="toc-number">1.2.0.1.</span> <span class="toc-text">1、r</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2、b"><span class="toc-number">1.2.0.2.</span> <span class="toc-text">2、b</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3、swpd"><span class="toc-number">1.2.0.3.</span> <span class="toc-text">3、swpd</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4、free"><span class="toc-number">1.2.0.4.</span> <span class="toc-text">4、free</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5、buff"><span class="toc-number">1.2.0.5.</span> <span class="toc-text">5、buff</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6、cache"><span class="toc-number">1.2.0.6.</span> <span class="toc-text">6、cache</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#7、si"><span class="toc-number">1.2.0.7.</span> <span class="toc-text">7、si</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#8、so"><span class="toc-number">1.2.0.8.</span> <span class="toc-text">8、so</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#9、bi"><span class="toc-number">1.2.0.9.</span> <span class="toc-text">9、bi</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#10、bo"><span class="toc-number">1.2.0.10.</span> <span class="toc-text">10、bo</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#11、in"><span class="toc-number">1.2.0.11.</span> <span class="toc-text">11、in</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#12、cs"><span class="toc-number">1.2.0.12.</span> <span class="toc-text">12、cs</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#13、us"><span class="toc-number">1.2.0.13.</span> <span class="toc-text">13、us</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#14、sy"><span class="toc-number">1.2.0.14.</span> <span class="toc-text">14、sy</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#15、id"><span class="toc-number">1.2.0.15.</span> <span class="toc-text">15、id</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#16、wt"><span class="toc-number">1.2.0.16.</span> <span class="toc-text">16、wt</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#三、sar"><span class="toc-number">1.2.1.</span> <span class="toc-text">三、sar</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-CPU资源监控"><span class="toc-number">1.2.1.1.</span> <span class="toc-text">1. CPU资源监控</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-inode、文件和其他内核表监控"><span class="toc-number">1.2.1.2.</span> <span class="toc-text">2. inode、文件和其他内核表监控</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-内存和交换空间监控"><span class="toc-number">1.2.1.3.</span> <span class="toc-text">3. 内存和交换空间监控</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-内存分页监控"><span class="toc-number">1.2.1.4.</span> <span class="toc-text">4. 内存分页监控</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-I-O和传送速率监控"><span class="toc-number">1.2.1.5.</span> <span class="toc-text">5. I/O和传送速率监控</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6-进程队列长度和平均负载状态监控"><span class="toc-number">1.2.1.6.</span> <span class="toc-text">6. 进程队列长度和平均负载状态监控</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#7-系统交换活动信息监控"><span class="toc-number">1.2.1.7.</span> <span class="toc-text">7. 系统交换活动信息监控</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#8-设备使用情况监控"><span class="toc-number">1.2.1.8.</span> <span class="toc-text">8. 设备使用情况监控</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#9-总结"><span class="toc-number">1.2.1.9.</span> <span class="toc-text">9. 总结</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#四、mpstat"><span class="toc-number">1.2.2.</span> <span class="toc-text">四、mpstat</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#语法"><span class="toc-number">1.2.2.1.</span> <span class="toc-text">语法</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#五、iostat"><span class="toc-number">1.2.3.</span> <span class="toc-text">五、iostat</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1、简介"><span class="toc-number">1.2.3.1.</span> <span class="toc-text">1、简介</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2、语法"><span class="toc-number">1.2.3.2.</span> <span class="toc-text">2、语法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3、入门使用"><span class="toc-number">1.2.3.3.</span> <span class="toc-text">3、入门使用</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#六、netstat"><span class="toc-number">1.2.4.</span> <span class="toc-text">六、netstat</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1、简介-1"><span class="toc-number">1.2.4.1.</span> <span class="toc-text">1、简介</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2、输出信息含义"><span class="toc-number">1.2.4.2.</span> <span class="toc-text">2、输出信息含义</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3、常见参数"><span class="toc-number">1.2.4.3.</span> <span class="toc-text">3、常见参数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4、实用命令实例"><span class="toc-number">1.2.4.4.</span> <span class="toc-text">4、实用命令实例</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#列出所有端口-包括监听和未监听的"><span class="toc-number">1.2.4.4.1.</span> <span class="toc-text">列出所有端口 (包括监听和未监听的)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#列出所有处于监听状态的-Sockets"><span class="toc-number">1.2.4.4.2.</span> <span class="toc-text">列出所有处于监听状态的 Sockets</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#显示每个协议的统计信息"><span class="toc-number">1.2.4.4.3.</span> <span class="toc-text">显示每个协议的统计信息</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#在-netstat-输出中显示-PID-和进程名称-netstat-p"><span class="toc-number">1.2.4.4.4.</span> <span class="toc-text">在 netstat 输出中显示 PID 和进程名称 netstat -p</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#在-netstat-输出中不显示主机，端口和用户名-host-port-or-user"><span class="toc-number">1.2.4.4.5.</span> <span class="toc-text">在 netstat 输出中不显示主机，端口和用户名 (host, port or user)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#持续输出-netstat-信息"><span class="toc-number">1.2.4.4.6.</span> <span class="toc-text">持续输出 netstat 信息</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#显示系统不支持的地址族-Address-Families"><span class="toc-number">1.2.4.4.7.</span> <span class="toc-text">显示系统不支持的地址族 (Address Families)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#显示核心路由信息-netstat-r"><span class="toc-number">1.2.4.4.8.</span> <span class="toc-text">显示核心路由信息 netstat -r</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#找出程序运行的端口"><span class="toc-number">1.2.4.4.9.</span> <span class="toc-text">找出程序运行的端口</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#显示网络接口列表"><span class="toc-number">1.2.4.4.10.</span> <span class="toc-text">显示网络接口列表</span></a></li></ol></li></ol></li></ol></li></ol></li></ol>
+		
+		</div>
+		
+		<h1 id="Linux性能检查工具"><a href="#Linux性能检查工具" class="headerlink" title="Linux性能检查工具"></a>Linux性能检查工具</h1><h2 id="一、Top"><a href="#一、Top" class="headerlink" title="一、Top"></a>一、Top</h2><p>TOP是一个动态显示过程,即可以通过用户按键来不断刷新当前状态.如果在前台执行该命令,它将独占前台,直到用户终止该程序为止.比较准确的说,top命令提供了实时的对系统处理器的状态监视.它将显示系统中CPU最“敏感”的任务列表.该命令可以按CPU使用.内存使用和执行时间对任务进行排序；而且该命令的很多特性都可以通过交互式命令或者在个人定制文件中进行设定.<br>top - 12:38:33 up 50 days, 23:15,  7 users,  load average: 60.58, 61.14, 61.22<br>Tasks: 203 total,  60 running, 139 sleeping,   4 stopped,   0 zombie<br>Cpu(s)  : 27.0%us, 73.0%sy,  0.0%ni,  0.0%id,  0.0%wa,  0.0%hi,  0.0%si,  0.0%st<br>Mem:   1939780k total,  1375280k used,   564500k free,   109680k buffers<br>Swap:  4401800k total,   497456k used,  3904344k free,   848712k cached<br>PID USER      PR  NI  VIRT  RES  SHR S %CPU %MEM    TIME+  COMMAND<br> 4338 oracle    25   0  627m 209m 207m R    0 11.0 297:14.76 oracle<br> 4267 oracle    25   0  626m 144m 143m R    6  7.6  89:16.62 oracle<br> 3458 oracle    25   0  672m 133m 124m R    0  7.1   1283:08 oracle<br> 3478 oracle    25   0  672m 124m 115m R    0  6.6   1272:30 oracle<br> 3395 oracle    25   0  672m 122m 113m R    0  6.5   1270:03 oracle                                 </p>
+<h3 id="A-TOP前五行统计信息"><a href="#A-TOP前五行统计信息" class="headerlink" title="A.  TOP前五行统计信息"></a>A.  TOP前五行统计信息</h3><p>统计信息区前五行是系统整体的统计信息。</p>
+<h4 id="1-第一行是任务队列信息"><a href="#1-第一行是任务队列信息" class="headerlink" title="1. 第一行是任务队列信息"></a>1. 第一行是任务队列信息</h4><p>同 uptime  命令的执行结果:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@localhost ~]<span class="comment"># uptime</span></div><div class="line"> 13:22:30 up 8 min,  4 users,  load average: 0.14, 0.38, 0.25</div></pre></td></tr></table></figure></p>
+<p>其内容如下:</p>
+<table>
+<thead>
+<tr>
+<th>值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>12:38:33</td>
+<td>当前时间</td>
+</tr>
+<tr>
+<td>up 50days</td>
+<td>系统运行时间，格式为时:分</td>
+</tr>
+<tr>
+<td>1 user</td>
+<td>当前登录用户数</td>
+</tr>
+<tr>
+<td>load average: 0.06, 0.60, 0.48</td>
+<td>系统负载，即任务队列的平均长度。 三个数值分别为  1分钟、5分钟、15分钟前到现在的平均值。</td>
+</tr>
+</tbody>
+</table>
+<h4 id="2-第二、三行为进程和CPU的信息"><a href="#2-第二、三行为进程和CPU的信息" class="headerlink" title="2. 第二、三行为进程和CPU的信息"></a>2. 第二、三行为进程和CPU的信息</h4><p>当有多个CPU时，这些内容可能会超过两行。内容如下：</p>
+<table>
+<thead>
+<tr>
+<th>值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tasks: 29 total</td>
+<td>进程总数</td>
+</tr>
+<tr>
+<td>1 running</td>
+<td>正在运行的进程数</td>
+</tr>
+<tr>
+<td>28 sleeping</td>
+<td>睡眠的进程数</td>
+</tr>
+<tr>
+<td>0 stopped</td>
+<td>停止的进程数</td>
+</tr>
+<tr>
+<td>0 zombie</td>
+<td>僵尸进程数</td>
+</tr>
+<tr>
+<td>Cpu(s): 0.3% us</td>
+<td>用户空间占用CPU百分比</td>
+</tr>
+<tr>
+<td>1.0% sy</td>
+<td>内核空间占用CPU百分比</td>
+</tr>
+<tr>
+<td>0.0% ni</td>
+<td>用户进程空间内改变过优先级的进程占用CPU百分比</td>
+</tr>
+<tr>
+<td>98.7% id</td>
+<td>空闲CPU百分比</td>
+</tr>
+<tr>
+<td>0.0% wa</td>
+<td>等待输入输出的CPU时间百分比</td>
+</tr>
+<tr>
+<td>0.0% hi</td>
+<td></td>
+</tr>
+<tr>
+<td>0.0% si</td>
+</tr>
+</tbody>
+</table>
+<h4 id="3-第四五行为内存信息。"><a href="#3-第四五行为内存信息。" class="headerlink" title="3. 第四五行为内存信息。"></a>3. 第四五行为内存信息。</h4><p>内容如下：</p>
+<table>
+<thead>
+<tr>
+<th>值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mem: 191272k total</td>
+<td>物理内存总量</td>
+</tr>
+<tr>
+<td>173656k used</td>
+<td>使用的物理内存总量</td>
+</tr>
+<tr>
+<td>17616k free</td>
+<td>空闲内存总量</td>
+</tr>
+<tr>
+<td>22052k buffers</td>
+<td>用作内核缓存的内存量</td>
+</tr>
+<tr>
+<td>Swap: 192772k total</td>
+<td>交换区总量</td>
+</tr>
+<tr>
+<td>0k used</td>
+<td>使用的交换区总量</td>
+</tr>
+<tr>
+<td>192772k free</td>
+<td>空闲交换区总量</td>
+</tr>
+<tr>
+<td>123988k cached</td>
+<td>缓冲的交换区总量。 内存中的内容被换出到交换区，而后又被换入到内存，但使用过的交换区尚未被覆盖， 该数值即为这些内容已存在于内存中的交换区的大小。相应的内存再次被换出时可不必再对交换区写入。</td>
+</tr>
+</tbody>
+</table>
+<h4 id="B-进程信息"><a href="#B-进程信息" class="headerlink" title="B.  进程信息"></a>B.  进程信息</h4><table>
+<thead>
+<tr>
+<th>列名</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PID</td>
+<td>进程id</td>
+</tr>
+<tr>
+<td>PPID</td>
+<td>父进程id</td>
+</tr>
+<tr>
+<td>RUSER</td>
+<td>Real user name</td>
+</tr>
+<tr>
+<td>UID</td>
+<td>进程所有者的用户id</td>
+</tr>
+<tr>
+<td>USER</td>
+<td>进程所有者的用户名</td>
+</tr>
+<tr>
+<td>GROUP</td>
+<td>进程所有者的组名</td>
+</tr>
+<tr>
+<td>TTY</td>
+<td>启动进程的终端名。不是从终端启动的进程则显示为 ?</td>
+</tr>
+<tr>
+<td>PR</td>
+<td>优先级</td>
+</tr>
+<tr>
+<td>NI</td>
+<td>nice值。负值表示高优先级，正值表示低优先级</td>
+</tr>
+<tr>
+<td>P</td>
+<td>最后使用的CPU，仅在多CPU环境下有意义</td>
+</tr>
+<tr>
+<td>%CPU</td>
+<td>上次更新到现在的CPU时间占用百分比</td>
+</tr>
+<tr>
+<td>TIME</td>
+<td>进程使用的CPU时间总计，单位秒</td>
+</tr>
+<tr>
+<td>TIME+</td>
+<td>进程使用的CPU时间总计，单位1/100秒</td>
+</tr>
+<tr>
+<td>%MEM</td>
+<td>进程使用的物理内存百分比</td>
+</tr>
+<tr>
+<td>VIRT</td>
+<td>进程使用的虚拟内存总量，单位kb。VIRT=SWAP+RES</td>
+</tr>
+<tr>
+<td>SWAP</td>
+<td>进程使用的虚拟内存中，被换出的大小，单位kb。</td>
+</tr>
+<tr>
+<td>RES</td>
+<td>进程使用的、未被换出的物理内存大小，单位kb。RES=CODE+DATA</td>
+</tr>
+<tr>
+<td>CODE</td>
+<td>可执行代码占用的物理内存大小，单位kb</td>
+</tr>
+<tr>
+<td>DATA</td>
+<td>可执行代码以外的部分(数据段+栈)占用的物理内存大小，单位kb</td>
+</tr>
+<tr>
+<td>SHR</td>
+<td>共享内存大小，单位kb</td>
+</tr>
+<tr>
+<td>nFLT</td>
+<td>页面错误次数</td>
+</tr>
+<tr>
+<td>nDRT</td>
+<td>最后一次写入到现在，被修改过的页面数。</td>
+</tr>
+<tr>
+<td>S</td>
+<td>进程状态。D=不可中断的睡眠状态;R=运行;S=睡眠;T=跟踪/停止;Z=僵尸进程</td>
+</tr>
+<tr>
+<td>COMMAND</td>
+<td>命令名/命令行</td>
+</tr>
+<tr>
+<td>WCHAN</td>
+<td>若该进程在睡眠，则显示睡眠中的系统函数名</td>
+</tr>
+<tr>
+<td>Flags</td>
+<td>任务标志，参考 sched.h</td>
+</tr>
+</tbody>
+</table>
+<h2 id="二、vmstat"><a href="#二、vmstat" class="headerlink" title="二、vmstat"></a>二、vmstat</h2><p>一般vmstat工具的使用是通过两个数字参数来完成的，第一个参数是采样的时间间隔数，单位是秒，第二个参数是采样的次数，如:</p>
+<pre>
+root@ubuntu:~# vmstat 2 1
+procs -----------memory---------- ---swap-- -----io---- -system-- ----cpu----
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa
+ 1  0      0 3498472 315836 3819540    0    0     0     1    2    0  0  0 100  0
+</pre>
+
+<p>2表示每个两秒采集一次服务器状态，1表示只采集一次(如果想一只采集第二个参数不写就可以，这表示vmstat每2秒采集数据，一直采集，直到我结束程序)。</p>
+<h4 id="1、r"><a href="#1、r" class="headerlink" title="1、r"></a>1、r</h4><p>表示运行队列(就是说多少个进程真的分配到CPU)，我测试的服务器目前CPU比较空闲，没什么程序在跑，当这个值超过了CPU数目，就会出现CPU瓶颈了。这个也和top的负载有关系，一般负载超过了3就比较高，超过了5就高，超过了10就不正常了，服务器的状态很危险。top的负载类似每秒的运行队列。如果运行队列过大，表示你的CPU很繁忙，一般会造成CPU使用率很高。</p>
+<h4 id="2、b"><a href="#2、b" class="headerlink" title="2、b"></a>2、b</h4><p>表示阻塞的进程,这个不多说，进程阻塞，大家懂的。</p>
+<h4 id="3、swpd"><a href="#3、swpd" class="headerlink" title="3、swpd"></a>3、swpd</h4><p>虚拟内存已使用的大小，如果大于0，表示你的机器物理内存不足了，如果不是程序内存泄露的原因，那么你该升级内存了或者把耗内存的任务迁移到其他机器。</p>
+<h4 id="4、free"><a href="#4、free" class="headerlink" title="4、free"></a>4、free</h4><p>空闲的物理内存的大小，我的机器内存总共8G，剩余3415M。</p>
+<h4 id="5、buff"><a href="#5、buff" class="headerlink" title="5、buff"></a>5、buff</h4><p>Linux/Unix系统是用来存储，目录里面有什么内容，权限等的缓存，我本机大概占用300多M</p>
+<h4 id="6、cache"><a href="#6、cache" class="headerlink" title="6、cache"></a>6、cache</h4><p>cache直接用来记忆我们打开的文件,给文件做缓冲，我本机大概占用300多M(这里是Linux/Unix的聪明之处，把空闲的物理内存的一部分拿来做文件和目录的缓存，是为了提高 程序执行的性能，当程序使用内存时，buffer/cached会很快地被使用。)</p>
+<h4 id="7、si"><a href="#7、si" class="headerlink" title="7、si"></a>7、si</h4><p>每秒从磁盘读入虚拟内存的大小，如果这个值大于0，表示物理内存不够用或者内存泄露了，要查找耗内存进程解决掉。我的机器内存充裕，一切正常。</p>
+<h4 id="8、so"><a href="#8、so" class="headerlink" title="8、so"></a>8、so</h4><p>每秒虚拟内存写入磁盘的大小，如果这个值大于0，同上。</p>
+<h4 id="9、bi"><a href="#9、bi" class="headerlink" title="9、bi"></a>9、bi</h4><p>块设备每秒接收的块数量，这里的块设备是指系统上所有的磁盘和其他块设备，默认块大小是1024byte，我本机上没什么IO操作，所以一直是0，但是我曾在处理拷贝大量数据(2-3T)的机器上看过可以达到140000/s，磁盘写入速度差不多140M每秒</p>
+<h4 id="10、bo"><a href="#10、bo" class="headerlink" title="10、bo"></a>10、bo</h4><p>块设备每秒发送的块数量，例如我们读取文件，bo就要大于0。bi和bo一般都要接近0，不然就是IO过于频繁，需要调整。</p>
+<h4 id="11、in"><a href="#11、in" class="headerlink" title="11、in"></a>11、in</h4><p>每秒CPU的中断次数，包括时间中断</p>
+<h4 id="12、cs"><a href="#12、cs" class="headerlink" title="12、cs"></a>12、cs</h4><p>每秒上下文切换次数，例如我们调用系统函数，就要进行上下文切换，线程的切换，也要进程上下文切换，这个值要越小越好，太大了，要考虑调低线程或者进程的数目,例如在apache和nginx这种web服务器中，我们一般做性能测试时会进行几千并发甚至几万并发的测试，选择web服务器的进程可以由进程或者线程的峰值一直下调，压测，直到cs到一个比较小的值，这个进程和线程数就是比较合适的值了。系统调用也是，每次调用系统函数，我们的代码就会进入内核空间，导致上下文切换，这个是很耗资源，也要尽量避免频繁调用系统函数。上下文切换次数过多表示你的CPU大部分浪费在上下文切换，导致CPU干正经事的时间少了，CPU没有充分利用，是不可取的。</p>
+<h4 id="13、us"><a href="#13、us" class="headerlink" title="13、us"></a>13、us</h4><p>用户CPU时间，我曾经在一个做加密解密很频繁的服务器上，可以看到us接近100,r运行队列达到80(机器在做压力测试，性能表现不佳)。</p>
+<h4 id="14、sy"><a href="#14、sy" class="headerlink" title="14、sy"></a>14、sy</h4><p>系统CPU时间，如果太高，表示系统调用时间长，例如是IO操作频繁。</p>
+<h4 id="15、id"><a href="#15、id" class="headerlink" title="15、id"></a>15、id</h4><p>空闲 CPU时间，一般来说，id + us + sy = 100,一般我认为id是空闲CPU使用率，us是用户CPU使用率，sy是系统CPU使用率。</p>
+<h4 id="16、wt"><a href="#16、wt" class="headerlink" title="16、wt"></a>16、wt</h4><p>等待IO CPU时间。</p>
+<h3 id="三、sar"><a href="#三、sar" class="headerlink" title="三、sar"></a>三、sar</h3><p>sar（System Activity Reporter系统活动情况报告）是目前 Linux 上最为全面的系统性能分析工具之一，可以从多方面对系统的活动进行报告，包括：文件的读写情况、系统调用的使用情况、磁盘I/O、CPU效率、内存使用状况、进程活动及IPC有关的活动等。本文主要以CentOS 6.3 x64系统为例，介绍sar命令。</p>
+<pre>
+sar命令常用格式
+sar [options] [-A] [-o file] t [n]
+其中：
+t为采样间隔，n为采样次数，默认值是1；
+-o file表示将命令结果以二进制格式存放在文件中，file 是文件名。
+options 为命令行选项，sar命令常用选项如下：
+-A：所有报告的总和
+-u：输出CPU使用情况的统计信息
+-v：输出inode、文件和其他内核表的统计信息
+-d：输出每一个块设备的活动信息
+-r：输出内存和交换空间的统计信息
+-b：显示I/O和传送速率的统计信息
+-a：文件读写情况
+-c：输出进程统计信息，每秒创建的进程数
+-R：输出内存页面的统计信息
+-y：终端设备活动情况
+-w：输出系统交换活动信息
+</pre>
+
+<h4 id="1-CPU资源监控"><a href="#1-CPU资源监控" class="headerlink" title="1. CPU资源监控"></a>1. CPU资源监控</h4><p>例如，每10秒采样一次，连续采样3次，观察CPU 的使用情况，并将采样结果以二进制形式存入当前目录下的文件test中，需键入如下命令：</p>
+<pre>
+sar -u -o test 10 3
+屏幕显示如下：
+17:06:16 CPU %user %nice %system %iowait %steal %idle
+17:06:26 all 0.00 0.00 0.20 0.00 0.00 99.80
+17:06:36 all 0.00 0.00 0.20 0.00 0.00 99.80
+17:06:46 all 0.00 0.00 0.10 0.00 0.00 99.90
+Average: all 0.00 0.00 0.17 0.00 0.00 99.83
+输出项说明：
+CPU：all 表示统计信息为所有 CPU 的平均值。
+%user：显示在用户级别(application)运行使用 CPU 总时间的百分比。
+%nice：显示在用户级别，用于nice操作，所占用 CPU 总时间的百分比。
+%system：在核心级别(kernel)运行所使用 CPU 总时间的百分比。
+%iowait：显示用于等待I/O操作占用 CPU 总时间的百分比。
+%steal：管理程序(hypervisor)为另一个虚拟进程提供服务而等待虚拟 CPU 的百分比。
+%idle：显示 CPU 空闲时间占用 CPU 总时间的百分比。
+1. 若 %iowait 的值过高，表示硬盘存在I/O瓶颈
+2. 若 %idle 的值高但系统响应慢时，有可能是 CPU 等待分配内存，此时应加大内存容量
+3. 若 %idle 的值持续低于1，则系统的 CPU 处理能力相对较低，表明系统中最需要解决的资源是 CPU 。
+
+如果要查看二进制文件test中的内容，需键入如下sar命令：
+sar -u -f test
+</pre>
+
+
+<h4 id="2-inode、文件和其他内核表监控"><a href="#2-inode、文件和其他内核表监控" class="headerlink" title="2. inode、文件和其他内核表监控"></a>2. inode、文件和其他内核表监控</h4><p>例如，每10秒采样一次，连续采样3次，观察核心表的状态，需键入如下命令：</p>
+<pre>
+sar -v 10 3
+屏幕显示如下：
+17:10:49 dentunusd file-nr inode-nr pty-nr
+17:10:59 6301 5664 12037 4
+17:11:09 6301 5664 12037 4
+17:11:19 6301 5664 12037 4
+Average: 6301 5664 12037 4
+
+输出项说明：
+dentunusd：目录高速缓存中未被使用的条目数量
+file-nr：文件句柄（file handle）的使用数量
+inode-nr：索引节点句柄（inode handle）的使用数量
+pty-nr：使用的pty数量
+</pre>
+
+<h4 id="3-内存和交换空间监控"><a href="#3-内存和交换空间监控" class="headerlink" title="3. 内存和交换空间监控"></a>3. 内存和交换空间监控</h4><p>例如，每10秒采样一次，连续采样3次，监控内存分页：</p>
+<pre>
+sar -r 10 3
+屏幕显示如下：
+16时55分22秒 kbmemfree kbmemused  %memused kbbuffers  kbcached  kbcommit   %commit  kbactive   kbinact   kbdirty
+16时55分32秒    135784   3740856     96.50    202708    364664   7719184     63.96   2477312    900676        76
+16时55分42秒    135484   3741156     96.51    202716    364716   7719184     63.96   2477196    900740        28
+16时55分52秒    135356   3741284     96.51    202732    364716   7719184     63.96   2477316    900772        72
+平均时间:    135541   3741099     96.50    202719    364699   7719184     63.96   2477275    900729        59
+
+输出项说明：
+kbmemfree：这个值和free命令中的free值基本一致,所以它不包括buffer和cache的空间.
+kbmemused：这个值和free命令中的used值基本一致,所以它包括buffer和cache的空间.
+%memused：这个值是kbmemused和内存总量(不包括swap)的一个百分比.
+kbbuffers和kbcached：这两个值就是free命令中的buffer和cache.
+kbcommit：保证当前系统所需要的内存,即为了确保不溢出而需要的内存(RAM+swap).
+%commit：这个值是kbcommit与内存总量(包括swap)的一个百分比.
+</pre>
+
+<h4 id="4-内存分页监控"><a href="#4-内存分页监控" class="headerlink" title="4. 内存分页监控"></a>4. 内存分页监控</h4><p>例如，每10秒采样一次，连续采样3次，监控内存分页：</p>
+<pre>
+sar -B 10 3
+屏幕显示如下：
+16时57分02秒  pgpgin/s pgpgout/s   fault/s  majflt/s  pgfree/s pgscank/s pgscand/s pgsteal/s    %vmeff
+16时57分12秒      1.60     14.40  12318.40      0.10   3418.40      0.00      0.00      0.00      0.00
+16时57分22秒      3.20     11.60  12504.20      0.10   3484.60      0.00      0.00      0.00      0.00
+16时57分32秒      0.00     12.00  12298.70      0.00   3407.50      0.00      0.00      0.00      0.00
+平均时间:      1.60     12.67  12373.77      0.07   3436.83      0.00      0.00      0.00      0.00
+
+输出项说明：
+pgpgin/s：表示每秒从磁盘或SWAP置换到内存的字节数(KB)
+pgpgout/s：表示每秒从内存置换到磁盘或SWAP的字节数(KB)
+fault/s：每秒钟系统产生的缺页数,即主缺页与次缺页之和(major + minor)
+majflt/s：每秒钟产生的主缺页数.
+pgfree/s：每秒被放入空闲队列中的页个数
+pgscank/s：每秒被kswapd扫描的页个数
+pgscand/s：每秒直接被扫描的页个数
+pgsteal/s：每秒钟从cache中被清除来满足内存需要的页个数
+%vmeff：每秒清除的页(pgsteal)占总扫描页(pgscank+pgscand)的百分比
+</pre>
+
+<h4 id="5-I-O和传送速率监控"><a href="#5-I-O和传送速率监控" class="headerlink" title="5. I/O和传送速率监控"></a>5. I/O和传送速率监控</h4><p>例如，每10秒采样一次，连续采样3次，报告缓冲区的使用情况，需键入如下命令：</p>
+<pre>
+sar -b 10 3
+屏幕显示如下：
+18:51:05 tps rtps wtps bread/s bwrtn/s
+18:51:15 0.00 0.00 0.00 0.00 0.00
+18:51:25 1.92 0.00 1.92 0.00 22.65
+18:51:35 0.00 0.00 0.00 0.00 0.00
+Average: 0.64 0.00 0.64 0.00 7.59
+
+输出项说明：
+tps：每秒钟物理设备的 I/O 传输总量
+rtps：每秒钟从物理设备读入的数据总量
+wtps：每秒钟向物理设备写入的数据总量
+bread/s：每秒钟从物理设备读入的数据量，单位为 块/s
+bwrtn/s：每秒钟向物理设备写入的数据量，单位为 块/s
+</pre>
+
+<h4 id="6-进程队列长度和平均负载状态监控"><a href="#6-进程队列长度和平均负载状态监控" class="headerlink" title="6. 进程队列长度和平均负载状态监控"></a>6. 进程队列长度和平均负载状态监控</h4><p>例如，每10秒采样一次，连续采样3次，监控进程队列长度和平均负载状态：</p>
+<pre>
+sar -q 10 3
+屏幕显示如下：
+19:25:50 runq-sz plist-sz ldavg-1 ldavg-5 ldavg-15
+19:26:00 0 259 0.00 0.00 0.00
+19:26:10 0 259 0.00 0.00 0.00
+19:26:20 0 259 0.00 0.00 0.00
+Average: 0 259 0.00 0.00 0.00
+
+输出项说明：
+runq-sz：运行队列的长度（等待运行的进程数）
+plist-sz：进程列表中进程（processes）和线程（threads）的数量
+ldavg-1：最后1分钟的系统平均负载（System load average）
+ldavg-5：过去5分钟的系统平均负载
+ldavg-15：过去15分钟的系统平均负载
+</pre>
+
+<h4 id="7-系统交换活动信息监控"><a href="#7-系统交换活动信息监控" class="headerlink" title="7. 系统交换活动信息监控"></a>7. 系统交换活动信息监控</h4><p>例如，每10秒采样一次，连续采样3次，监控系统交换活动信息：</p>
+<pre>
+sar -    W 10 3
+屏幕显示如下：
+19:39:50 pswpin/s pswpout/s
+19:40:00 0.00 0.00
+19:40:10 0.00 0.00
+19:40:20 0.00 0.00
+Average: 0.00 0.00
+
+输出项说明：
+pswpin/s：每秒系统换入的交换页面（swap page）数量
+pswpout/s：每秒系统换出的交换页面（swap page）数量
+</pre>
+
+<h4 id="8-设备使用情况监控"><a href="#8-设备使用情况监控" class="headerlink" title="8. 设备使用情况监控"></a>8. 设备使用情况监控</h4><p>例如，每10秒采样一次，连续采样3次，报告设备使用情况，需键入如下命令：</p>
+<pre>
+sar -d 10 3 –p
+屏幕显示如下：
+17:45:54    DEV    tps    rd_sec/s    wr_sec/s    avgrq-sz    avgqu-sz    await    svctm    %util
+17:46:04    scd0    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00
+17:46:04    sda    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00
+17:46:04    vg_livedvd-lv_root    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00
+17:46:04    vg_livedvd-lv_swap    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00
+
+其中：
+参数-p可以打印出sda,hdc等磁盘设备名称,如果不用参数-p,设备节点则有可能是dev8-0,dev22-0
+tps:每秒从物理磁盘I/O的次数.多个逻辑请求会被合并为一个I/O磁盘请求,一次传输的大小是不确定的.
+rd_sec/s:每秒读扇区的次数.
+wr_sec/s:每秒写扇区的次数.
+avgrq-sz:平均每次设备I/O操作的数据大小(扇区).
+avgqu-sz:磁盘请求队列的平均长度.
+await:从请求磁盘操作到系统完成处理,每次请求的平均消耗时间,包括请求队列等待时间,单位是毫秒(1秒=1000毫秒).
+svctm:系统处理每次请求的平均时间,不包括在请求队列中消耗的时间.
+%util:I/O请求占CPU的百分比,比率越大,说明越饱和.
+1. avgqu-sz 的值较低时，设备的利用率较高。
+2. 当%util的值接近 1% 时，表示设备带宽已经占满。
+</pre>
+
+<h4 id="9-总结"><a href="#9-总结" class="headerlink" title="9. 总结"></a>9. 总结</h4><p>要判断系统瓶颈问题，有时需几个 sar 命令选项结合起来<br>怀疑CPU存在瓶颈，可用 sar -u 和 sar -q 等来查看<br>怀疑内存存在瓶颈，可用 sar -B、sar -r 和 sar -W 等来查看<br>怀疑I/O存在瓶颈，可用 sar -b、sar -u 和 sar -d 等来查看</p>
+<h3 id="四、mpstat"><a href="#四、mpstat" class="headerlink" title="四、mpstat"></a>四、mpstat</h3><p>mpstat是Multiprocessor Statistics的缩写，是实时系统监控工具。其报告与CPU的一些统计信息，这些信息存放在/proc/stat文件中。在多CPUs系统里，其不但能查看所有CPU的平均状况信息，而且能够查看特定CPU的信息。mpstat最大的特点是：可以查看多核心cpu中每个计算核心的统计数据；而类似工具vmstat只能查看系统整体cpu情况。</p>
+<h4 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h4><pre>
+mpstat [-P {|ALL}] [internal [count]]
+参数 解释
+-P {|ALL} 表示监控哪个CPU， cpu在[0,cpu个数-1]中取值
+internal 相邻的两次采样的间隔时间、
+count 采样的次数，count只能和delay一起使用
+当没有参数时，mpstat则显示系统启动以后所有信息的平均值。有interval时，第一行的信息自系统启动以来的平均信息。从第二行开始，输出为前一个interval时间段的平均信息。
+</pre>
+如果要看每个cpu核心的详细当前运行状况信息，输出如下：
+
+<pre>
+mpstat  -P ALL 2
+19:43:58     CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest   %idle
+19:43:59     all    0.00    0.00    0.04    0.00    0.00    0.00    0.00    0.00   99.96
+19:43:59       0    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00  100.00
+19:43:59       1    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00  100.00
+.......
+19:43:59      13    0.99    0.00    0.00    0.00    0.00    0.00    0.00    0.00   99.01
+19:43:59      14    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00  100.00
+19:43:59      15    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00  100.00
+复制代码
+
+
+字段的含义如下
+%user      在internal时间段里，用户态的CPU时间(%)，不包含nice值为负进程  (usr/total)*100
+%nice      在internal时间段里，nice值为负进程的CPU时间(%)   (nice/total)*100
+%sys       在internal时间段里，内核时间(%)       (system/total)*100
+%iowait    在internal时间段里，硬盘IO等待时间(%) (iowait/total)*100
+%irq       在internal时间段里，硬中断时间(%)     (irq/total)*100
+%soft      在internal时间段里，软中断时间(%)     (softirq/total)*100
+%idle      在internal时间段里，CPU除去等待磁盘IO操作外的因为任何原因而空闲的时间闲置时间(%) (idle/total)*100
+计算公式如下
+total_cur=user+system+nice+idle+iowait+irq+softirq
+total_pre=pre_user+ pre_system+ pre_nice+ pre_idle+ pre_iowait+ pre_irq+ pre_softirq
+user=user_cur – user_pre
+total=total_cur-total_pre
+其中_cur 表示当前值，_pre表示interval时间前的值。上表中的所有值可取到两位小数点。
+</pre>
+
+<h3 id="五、iostat"><a href="#五、iostat" class="headerlink" title="五、iostat"></a>五、iostat</h3><h4 id="1、简介"><a href="#1、简介" class="headerlink" title="1、简介"></a>1、简介</h4><p>iostat主要用于监控系统设备的IO负载情况，iostat首次运行时显示自系统启动开始的各项统计信息，之后运行iostat将显示自上次运行该命令以后的统计信息。用户可以通过指定统计的次数和时间来获得所需的统计信息。</p>
+<h4 id="2、语法"><a href="#2、语法" class="headerlink" title="2、语法"></a>2、语法</h4><pre>
+iostat [ -c ] [ -d ] [ -h ] [ -N ] [ -k | -m ] [ -t ] [ -V ] [ -x ] [ -z ] [ device [...] | ALL ] [ -p [ device [,...] | ALL ] ] [ interval [ count ] ]
+</pre>
+
+<h4 id="3、入门使用"><a href="#3、入门使用" class="headerlink" title="3、入门使用"></a>3、入门使用</h4><pre>
+iostat -d -k 2
+参数 -d 表示，显示设备（磁盘）使用状态；-k某些使用block为单位的列强制使用Kilobytes为单位；2表示，数据显示每隔2秒刷新一次。
+
+输出如下
+iostat -d -k 1 10
+Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
+sda              39.29        21.14         1.44  441339807   29990031
+sda1              0.00         0.00         0.00       1623        523
+sda2              1.32         1.43         4.54   29834273   94827104
+sda3              6.30         0.85        24.95   17816289  520725244
+sda5              0.85         0.46         3.40    9543503   70970116
+sda6              0.00         0.00         0.00        550        236
+sda7              0.00         0.00         0.00        406          0
+sda8              0.00         0.00         0.00        406          0
+sda9              0.00         0.00         0.00        406          0
+sda10            60.68        18.35        71.43  383002263 1490928140
+
+Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
+sda             327.55      5159.18       102.04       5056        100
+sda1              0.00         0.00         0.00          0          0
+输出信息的意义
+tps：该设备每秒的传输次数（Indicate the number of transfers per second that were issued to the device.）。"一次传输"意思是"一次I/O请求"。多个逻辑请求可能会被合并为"一次I/O请求"。"一次传输"请求的大小是未知的。
+kB_read/s：每秒从设备（drive expressed）读取的数据量；
+kB_wrtn/s：每秒向设备（drive expressed）写入的数据量；
+kB_read：读取的总数据量；
+kB_wrtn：写入的总数量数据量；这些单位都为Kilobytes。
+上面的例子中，我们可以看到磁盘sda以及它的各个分区的统计数据，当时统计的磁盘总TPS是39.29，下面是各个分区的TPS。（因为是瞬间值，所以总TPS并不严格等于各个分区TPS的总和）
+指定监控的设备名称为sda，该命令的输出结果和上面命令完全相同。
+
+iostat -d sda 2
+默认监控所有的硬盘设备，现在指定只监控sda。 
+
+-x 参数
+iostat还有一个比较常用的选项-x，该选项将用于显示和io相关的扩展数据。
+iostat -d -x -k 1 10
+Device:    rrqm/s wrqm/s   r/s   w/s  rsec/s  wsec/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await  svctm  %util
+sda          1.56  28.31  7.80 31.49   42.51    2.92    21.26     1.46     1.16     0.03    0.79   2.62  10.28
+Device:    rrqm/s wrqm/s   r/s   w/s  rsec/s  wsec/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await  svctm  %util
+sda          2.00  20.00 381.00  7.00 12320.00  216.00  6160.00   108.00    32.31     1.75    4.50   2.17  84.20
+输出信息的含义
+rrqm/s：每秒这个设备相关的读取请求有多少被Merge了（当系统调用需要读取数据的时候，VFS将请求发到各个FS，如果FS发现不同的读取请求读取的是相同Block的数据，FS会将这个请求合并Merge）；wrqm/s：每秒这个设备相关的写入请求有多少被Merge了。
+rsec/s：每秒读取的扇区数；
+wsec/：每秒写入的扇区数。
+rKB/s：The number of read requests that were issued to the device per second；
+wKB/s：The number of write requests that were issued to the device per second；
+avgrq-sz 平均请求扇区的大小
+avgqu-sz 是平均请求队列的长度。毫无疑问，队列长度越短越好。    
+await：  每一个IO请求的处理的平均时间（单位是微秒毫秒）。这里可以理解为IO的响应时间，一般地系统IO响应时间应该低于5ms，如果大于10ms就比较大了。
+         这个时间包括了队列时间和服务时间，也就是说，一般情况下，await大于svctm，它们的差值越小，则说明队列时间越短，反之差值越大，队列时间越长，说明系统出了问题。
+svctm    表示平均每次设备I/O操作的服务时间（以毫秒为单位）。如果svctm的值与await很接近，表示几乎没有I/O等待，磁盘性能很好，如果await的值远高于svctm的值，则表示I/O队列等待太长，         系统上运行的应用程序将变慢。
+%util： 在统计时间内所有处理IO时间，除以总共统计时间。例如，如果统计间隔1秒，该设备有0.8秒在处理IO，而0.2秒闲置，那么该设备的%util = 0.8/1 = 80%，所以该参数暗示了设备的繁忙程度
+。一般地，如果该参数是100%表示设备已经接近满负荷运行了（当然如果是多磁盘，即使%util是100%，因为磁盘的并发能力，所以磁盘使用未必就到了瓶颈）。
+
+-c 参数
+iostat还可以用来获取cpu部分状态值：
+iostat -c 1 10
+avg-cpu: %user %nice %sys %iowait %idle
+1.98 0.00 0.35 11.45 86.22
+avg-cpu: %user %nice %sys %iowait %idle
+1.62 0.00 0.25 34.46 63.67
+常见用法
+iostat -d -k 1 10         #查看TPS和吞吐量信息(磁盘读写速度单位为KB)
+iostat -d -m 2            #查看TPS和吞吐量信息(磁盘读写速度单位为MB)
+iostat -d -x -k 1 10      #查看设备使用率（%util）、响应时间（await） iostat -c 1 10 #查看cpu状态
+
+实例分析
+ostat -d -k 1 |grep sda10
+Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
+sda10            60.72        18.95        71.53  395637647 1493241908
+sda10           299.02      4266.67       129.41       4352        132
+sda10           483.84      4589.90      4117.17       4544       4076
+sda10           218.00      3360.00       100.00       3360        100
+sda10           546.00      8784.00       124.00       8784        124
+sda10           827.00     13232.00       136.00      13232        136
+上面看到，磁盘每秒传输次数平均约400；每秒磁盘读取约5MB，写入约1MB。 
+
+iostat -d -x -k 1
+Device:    rrqm/s wrqm/s   r/s   w/s  rsec/s  wsec/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await  svctm  %util
+sda          1.56  28.31  7.84 31.50   43.65    3.16    21.82     1.58     1.19     0.03    0.80   2.61  10.29
+sda          1.98  24.75 419.80  6.93 13465.35  253.47  6732.67   126.73    32.15     2.00    4.70   2.00  85.25
+sda          3.06  41.84 444.90 54.08 14204.08 2048.98  7102.04  1024.49    32.57     2.10    4.21   1.85  92.24
+可以看到磁盘的平均响应时间<5ms，磁盘使用率>80。磁盘响应正常，但是已经很繁忙了。
+</5ms，磁盘使用率></pre>
+
+<h3 id="六、netstat"><a href="#六、netstat" class="headerlink" title="六、netstat"></a>六、netstat</h3><h4 id="1、简介-1"><a href="#1、简介-1" class="headerlink" title="1、简介"></a>1、简介</h4><p>Netstat 命令用于显示各种网络相关信息，如网络连接，路由表，接口状态 (Interface Statistics)，masquerade 连接，多播成员 (Multicast Memberships) 等等。</p>
+<h4 id="2、输出信息含义"><a href="#2、输出信息含义" class="headerlink" title="2、输出信息含义"></a>2、输出信息含义</h4><p>执行netstat后，其输出结果为</p>
+<pre>
+Active Internet connections (w/o servers)
+Proto Recv-Q Send-Q Local Address Foreign Address State
+tcp 0 2 210.34.6.89:telnet 210.34.6.96:2873 ESTABLISHED
+tcp 296 0 210.34.6.89:1165 210.34.6.84:netbios-ssn ESTABLISHED
+tcp 0 0 localhost.localdom:9001 localhost.localdom:1162 ESTABLISHED
+tcp 0 0 localhost.localdom:1162 localhost.localdom:9001 ESTABLISHED
+tcp 0 80 210.34.6.89:1161 210.34.6.10:netbios-ssn CLOSE
+
+Active UNIX domain sockets (w/o servers)
+Proto RefCnt Flags Type State I-Node Path
+unix 1 [ ] STREAM CONNECTED 16178 @000000dd
+unix 1 [ ] STREAM CONNECTED 16176 @000000dc
+unix 9 [ ] DGRAM 5292 /dev/log
+unix 1 [ ] STREAM CONNECTED 16182 @000000df
+</pre>
+
+<p>从整体上看，netstat的输出结果可以分为两个部分：<br>一个是Active Internet connections，称为有源TCP连接，其中”Recv-Q”和”Send-Q”指%0A的是接收队列和发送队列。这些数字一般都应该是0。如果不是则表示软件包正在队列中堆积。这种情况只能在非常少的情况见到。<br>另一个是Active UNIX domain sockets，称为有源Unix域套接口(和网络套接字一样，但是只能用于本机通信，性能可以提高一倍)。<br>Proto显示连接使用的协议,RefCnt表示连接到本套接口上的进程号,Types显示套接口的类型,State显示套接口当前的状态,Path表示连接到套接口的其它进程使用的路径名。</p>
+<h4 id="3、常见参数"><a href="#3、常见参数" class="headerlink" title="3、常见参数"></a>3、常见参数</h4><p>-a (all)显示所有选项，默认不显示LISTEN相关<br>-t (tcp)仅显示tcp相关选项<br>-u (udp)仅显示udp相关选项<br>-n 拒绝显示别名，能显示数字的全部转化成数字。<br>-l 仅列出有在 Listen (监听) 的服務状态</p>
+<p>-p 显示建立相关链接的程序名<br>-r 显示路由信息，路由表<br>-e 显示扩展信息，例如uid等<br>-s 按各个协议进行统计<br>-c 每隔一个固定时间，执行该netstat命令。</p>
+<p>提示：LISTEN和LISTENING的状态只有用-a或者-l才能看到</p>
+<h4 id="4、实用命令实例"><a href="#4、实用命令实例" class="headerlink" title="4、实用命令实例"></a>4、实用命令实例</h4><h5 id="列出所有端口-包括监听和未监听的"><a href="#列出所有端口-包括监听和未监听的" class="headerlink" title="列出所有端口 (包括监听和未监听的)"></a>列出所有端口 (包括监听和未监听的)</h5><pre>
+列出所有端口 netstat -a
+ netstat -a | more
+ Active Internet connections (servers and established)
+ Proto Recv-Q Send-Q Local Address           Foreign Address         State
+ tcp        0      0 localhost:30037         *:*                     LISTEN
+ udp        0      0 *:bootpc                *:*
+
+列出所有 tcp 端口 netstat -at
+netstat -at
+ Active Internet connections (servers and established)
+ Proto Recv-Q Send-Q Local Address           Foreign Address         State
+ tcp        0      0 localhost:30037         *:*                     LISTEN
+ tcp        0      0 localhost:ipp           *:*                     LISTEN
+ tcp        0      0 *:smtp                  *:*                     LISTEN
+ tcp6       0      0 localhost:ipp           [::]:*                  LISTEN
+
+列出所有 udp 端口 netstat -au
+netstat -au
+ Active Internet connections (servers and established)
+ Proto Recv-Q Send-Q Local Address           Foreign Address         State
+ udp        0      0 *:bootpc                *:*
+ udp        0      0 *:49119                 *:*
+ udp        0      0 *:mdns                  *:*
+</pre>
+
+<h5 id="列出所有处于监听状态的-Sockets"><a href="#列出所有处于监听状态的-Sockets" class="headerlink" title="列出所有处于监听状态的 Sockets"></a>列出所有处于监听状态的 Sockets</h5><pre>
+只显示监听端口 netstat -l
+netstat -l
+ Active Internet connections (only servers)
+ Proto Recv-Q Send-Q Local Address           Foreign Address         State
+ tcp        0      0 localhost:ipp           *:*                     LISTEN
+ tcp6       0      0 localhost:ipp           [::]:*                  LISTEN
+ udp        0      0 *:49119                 *:*
+
+只列出所有监听 tcp 端口 netstat -lt
+netstat -lt
+ Active Internet connections (only servers)
+ Proto Recv-Q Send-Q Local Address           Foreign Address         State
+ tcp        0      0 localhost:30037         *:*                     LISTEN
+ tcp        0      0 *:smtp                  *:*                     LISTEN
+ tcp6       0      0 localhost:ipp           [::]:*                  LISTEN
+
+只列出所有监听 udp 端口 netstat -lu
+netstat -lu
+ Active Internet connections (only servers)
+ Proto Recv-Q Send-Q Local Address           Foreign Address         State
+ udp        0      0 *:49119                 *:*
+ udp        0      0 *:mdns                  *:*
+
+只列出所有监听 UNIX 端口 netstat -lx
+netstat -lx
+ Active UNIX domain sockets (only servers)
+ Proto RefCnt Flags       Type       State         I-Node   Path
+ unix  2      [ ACC ]     STREAM     LISTENING     6294     private/maildrop
+ unix  2      [ ACC ]     STREAM     LISTENING     6203     public/cleanup
+ unix  2      [ ACC ]     STREAM     LISTENING     6302     private/ifmail
+ unix  2      [ ACC ]     STREAM     LISTENING     6306     private/bsmtp
+</pre>
+
+
+<h5 id="显示每个协议的统计信息"><a href="#显示每个协议的统计信息" class="headerlink" title="显示每个协议的统计信息"></a>显示每个协议的统计信息</h5><pre>
+显示所有端口的统计信息 netstat -s
+netstat -s
+ Ip:
+ 11150 total packets received
+ 1 with invalid addresses
+ 0 forwarded
+ 0 incoming packets discarded
+ 11149 incoming packets delivered
+ 11635 requests sent out
+ Icmp:
+ 0 ICMP messages received
+ 0 input ICMP message failed.
+ Tcp:
+ 582 active connections openings
+ 2 failed connection attempts
+ 25 connection resets received
+ Udp:
+ 1183 packets received
+ 4 packets to unknown port received.
+ .....
+
+显示 TCP 或 UDP 端口的统计信息 netstat -st 或 -su
+netstat -st 
+netstat -su
+</pre>
+
+<h5 id="在-netstat-输出中显示-PID-和进程名称-netstat-p"><a href="#在-netstat-输出中显示-PID-和进程名称-netstat-p" class="headerlink" title="在 netstat 输出中显示 PID 和进程名称 netstat -p"></a>在 netstat 输出中显示 PID 和进程名称 netstat -p</h5><pre>
+netstat -p 可以与其它开关一起使用，就可以添加 “PID/进程名称” 到 netstat 输出中，这样 debugging 的时候可以很方便的发现特定端口运行的程序。
+netstat -pt
+ Active Internet connections (w/o servers)
+ Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+ tcp        1      0 ramesh-laptop.loc:47212 192.168.185.75:www        CLOSE_WAIT  2109/firefox
+ tcp        0      0 ramesh-laptop.loc:52750 lax:www ESTABLISHED 2109/firefox
+</pre>
+
+<h5 id="在-netstat-输出中不显示主机，端口和用户名-host-port-or-user"><a href="#在-netstat-输出中不显示主机，端口和用户名-host-port-or-user" class="headerlink" title="在 netstat 输出中不显示主机，端口和用户名 (host, port or user)"></a>在 netstat 输出中不显示主机，端口和用户名 (host, port or user)</h5><pre>
+当你不想让主机，端口和用户名显示，使用 netstat -n。将会使用数字代替那些名称。
+同样可以加速输出，因为不用进行比对查询。
+netstat -an
+如果只是不想让这三个名称中的一个被显示，使用以下命令
+netsat -a --numeric-ports
+netsat -a --numeric-hosts
+netsat -a --numeric-users
+</pre> 
+
+<h5 id="持续输出-netstat-信息"><a href="#持续输出-netstat-信息" class="headerlink" title="持续输出 netstat 信息"></a>持续输出 netstat 信息</h5><pre>
+netstat 将每隔一秒输出网络信息。
+netstat -c
+ Active Internet connections (w/o servers)
+ Proto Recv-Q Send-Q Local Address           Foreign Address         State
+ tcp        0      0 ramesh-laptop.loc:36130 101-101-181-225.ama:www ESTABLISHED
+ tcp        1      1 ramesh-laptop.loc:52564 101.11.169.230:www      CLOSING
+ tcp        0      0 ramesh-laptop.loc:43758 server-101-101-43-2:www ESTABLISHED
+ tcp        1      1 ramesh-laptop.loc:42367 101.101.34.101:www      CLOSING
+</pre>
+
+
+<h5 id="显示系统不支持的地址族-Address-Families"><a href="#显示系统不支持的地址族-Address-Families" class="headerlink" title="显示系统不支持的地址族 (Address Families)"></a>显示系统不支持的地址族 (Address Families)</h5><pre>
+netstat --verbose
+在输出的末尾，会有如下的信息
+
+netstat: no support for `AF IPX' on this system.
+netstat: no support for `AF AX25' on this system.
+netstat: no support for `AF X25' on this system.
+netstat: no support for `AF NETROM' on this system.
+</pre> 
+
+<h5 id="显示核心路由信息-netstat-r"><a href="#显示核心路由信息-netstat-r" class="headerlink" title="显示核心路由信息 netstat -r"></a>显示核心路由信息 netstat -r</h5><pre>
+netstat -r
+ Kernel IP routing table
+ Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+ 192.168.1.0     *               255.255.255.0   U         0 0          0 eth2
+ link-local      *               255.255.0.0     U         0 0          0 eth2
+ default         192.168.1.1     0.0.0.0         UG        0 0          0 eth2
+注意： 使用 netstat -rn 显示数字格式，不查询主机名称。
+</pre>
+
+
+<h5 id="找出程序运行的端口"><a href="#找出程序运行的端口" class="headerlink" title="找出程序运行的端口"></a>找出程序运行的端口</h5><pre>
+并不是所有的进程都能找到，没有权限的会不显示，使用 root 权限查看所有的信息。
+netstat -ap | grep ssh
+ tcp        1      0 dev-db:ssh           101.174.100.22:39213        CLOSE_WAIT  -
+ tcp        1      0 dev-db:ssh           101.174.100.22:57643        CLOSE_WAIT  -
+找出运行在指定端口的进程
+netstat -an | grep ':80'
+</pre> 
+
+<h5 id="显示网络接口列表"><a href="#显示网络接口列表" class="headerlink" title="显示网络接口列表"></a>显示网络接口列表</h5><pre>
+netstat -i
+ Kernel Interface table
+ Iface   MTU Met   RX-OK RX-ERR RX-DRP RX-OVR    TX-OK TX-ERR TX-DRP TX-OVR Flg
+ eth0       1500 0         0      0      0 0             0      0      0      0 BMU
+ eth2       1500 0     26196      0      0 0         26883      6      0      0 BMRU
+ lo        16436 0         4      0      0 0             4      0      0      0 LRU
+显示详细信息，像是 ifconfig 使用 netstat -ie:
+netstat -ie
+ Kernel Interface table
+ eth0      Link encap:Ethernet  HWaddr 00:10:40:11:11:11
+ UP BROADCAST MULTICAST  MTU:1500  Metric:1
+ RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+ TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+ collisions:0 txqueuelen:1000
+ RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+ Memory:f6ae0000-f6b00000
+</pre>  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Linux/">Linux</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Linux/">Linux</a><a href="/tags/top/">top</a><a href="/tags/vmstat/">vmstat</a><a href="/tags/sar/">sar</a><a href="/tags/iostat/">iostat</a><a href="/tags/netstat/">netstat</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2017/05/17/linux_command_performance/" data-title="Linux性能检查工具 | Leo Dominic" data-tsina="1868167451" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2017/05/18/token_signature/" title="基于 Token 的身份验证">
+  <strong>上一篇：</strong><br/>
+  <span>
+  基于 Token 的身份验证</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2017/05/16/elasticsearch_cluster_docker/"  title="Docker安装Elasticsearch集群">
+ <strong>下一篇：</strong><br/> 
+ <span>Docker安装Elasticsearch集群
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Linux性能检查工具"><span class="toc-number">1.</span> <span class="toc-text">Linux性能检查工具</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、Top"><span class="toc-number">1.1.</span> <span class="toc-text">一、Top</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#A-TOP前五行统计信息"><span class="toc-number">1.1.1.</span> <span class="toc-text">A.  TOP前五行统计信息</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-第一行是任务队列信息"><span class="toc-number">1.1.1.1.</span> <span class="toc-text">1. 第一行是任务队列信息</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-第二、三行为进程和CPU的信息"><span class="toc-number">1.1.1.2.</span> <span class="toc-text">2. 第二、三行为进程和CPU的信息</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-第四五行为内存信息。"><span class="toc-number">1.1.1.3.</span> <span class="toc-text">3. 第四五行为内存信息。</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#B-进程信息"><span class="toc-number">1.1.1.4.</span> <span class="toc-text">B.  进程信息</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、vmstat"><span class="toc-number">1.2.</span> <span class="toc-text">二、vmstat</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1、r"><span class="toc-number">1.2.0.1.</span> <span class="toc-text">1、r</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2、b"><span class="toc-number">1.2.0.2.</span> <span class="toc-text">2、b</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3、swpd"><span class="toc-number">1.2.0.3.</span> <span class="toc-text">3、swpd</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4、free"><span class="toc-number">1.2.0.4.</span> <span class="toc-text">4、free</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5、buff"><span class="toc-number">1.2.0.5.</span> <span class="toc-text">5、buff</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6、cache"><span class="toc-number">1.2.0.6.</span> <span class="toc-text">6、cache</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#7、si"><span class="toc-number">1.2.0.7.</span> <span class="toc-text">7、si</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#8、so"><span class="toc-number">1.2.0.8.</span> <span class="toc-text">8、so</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#9、bi"><span class="toc-number">1.2.0.9.</span> <span class="toc-text">9、bi</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#10、bo"><span class="toc-number">1.2.0.10.</span> <span class="toc-text">10、bo</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#11、in"><span class="toc-number">1.2.0.11.</span> <span class="toc-text">11、in</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#12、cs"><span class="toc-number">1.2.0.12.</span> <span class="toc-text">12、cs</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#13、us"><span class="toc-number">1.2.0.13.</span> <span class="toc-text">13、us</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#14、sy"><span class="toc-number">1.2.0.14.</span> <span class="toc-text">14、sy</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#15、id"><span class="toc-number">1.2.0.15.</span> <span class="toc-text">15、id</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#16、wt"><span class="toc-number">1.2.0.16.</span> <span class="toc-text">16、wt</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#三、sar"><span class="toc-number">1.2.1.</span> <span class="toc-text">三、sar</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-CPU资源监控"><span class="toc-number">1.2.1.1.</span> <span class="toc-text">1. CPU资源监控</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-inode、文件和其他内核表监控"><span class="toc-number">1.2.1.2.</span> <span class="toc-text">2. inode、文件和其他内核表监控</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-内存和交换空间监控"><span class="toc-number">1.2.1.3.</span> <span class="toc-text">3. 内存和交换空间监控</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-内存分页监控"><span class="toc-number">1.2.1.4.</span> <span class="toc-text">4. 内存分页监控</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-I-O和传送速率监控"><span class="toc-number">1.2.1.5.</span> <span class="toc-text">5. I/O和传送速率监控</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6-进程队列长度和平均负载状态监控"><span class="toc-number">1.2.1.6.</span> <span class="toc-text">6. 进程队列长度和平均负载状态监控</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#7-系统交换活动信息监控"><span class="toc-number">1.2.1.7.</span> <span class="toc-text">7. 系统交换活动信息监控</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#8-设备使用情况监控"><span class="toc-number">1.2.1.8.</span> <span class="toc-text">8. 设备使用情况监控</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#9-总结"><span class="toc-number">1.2.1.9.</span> <span class="toc-text">9. 总结</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#四、mpstat"><span class="toc-number">1.2.2.</span> <span class="toc-text">四、mpstat</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#语法"><span class="toc-number">1.2.2.1.</span> <span class="toc-text">语法</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#五、iostat"><span class="toc-number">1.2.3.</span> <span class="toc-text">五、iostat</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1、简介"><span class="toc-number">1.2.3.1.</span> <span class="toc-text">1、简介</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2、语法"><span class="toc-number">1.2.3.2.</span> <span class="toc-text">2、语法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3、入门使用"><span class="toc-number">1.2.3.3.</span> <span class="toc-text">3、入门使用</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#六、netstat"><span class="toc-number">1.2.4.</span> <span class="toc-text">六、netstat</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1、简介-1"><span class="toc-number">1.2.4.1.</span> <span class="toc-text">1、简介</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2、输出信息含义"><span class="toc-number">1.2.4.2.</span> <span class="toc-text">2、输出信息含义</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3、常见参数"><span class="toc-number">1.2.4.3.</span> <span class="toc-text">3、常见参数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4、实用命令实例"><span class="toc-number">1.2.4.4.</span> <span class="toc-text">4、实用命令实例</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#列出所有端口-包括监听和未监听的"><span class="toc-number">1.2.4.4.1.</span> <span class="toc-text">列出所有端口 (包括监听和未监听的)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#列出所有处于监听状态的-Sockets"><span class="toc-number">1.2.4.4.2.</span> <span class="toc-text">列出所有处于监听状态的 Sockets</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#显示每个协议的统计信息"><span class="toc-number">1.2.4.4.3.</span> <span class="toc-text">显示每个协议的统计信息</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#在-netstat-输出中显示-PID-和进程名称-netstat-p"><span class="toc-number">1.2.4.4.4.</span> <span class="toc-text">在 netstat 输出中显示 PID 和进程名称 netstat -p</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#在-netstat-输出中不显示主机，端口和用户名-host-port-or-user"><span class="toc-number">1.2.4.4.5.</span> <span class="toc-text">在 netstat 输出中不显示主机，端口和用户名 (host, port or user)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#持续输出-netstat-信息"><span class="toc-number">1.2.4.4.6.</span> <span class="toc-text">持续输出 netstat 信息</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#显示系统不支持的地址族-Address-Families"><span class="toc-number">1.2.4.4.7.</span> <span class="toc-text">显示系统不支持的地址族 (Address Families)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#显示核心路由信息-netstat-r"><span class="toc-number">1.2.4.4.8.</span> <span class="toc-text">显示核心路由信息 netstat -r</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#找出程序运行的端口"><span class="toc-number">1.2.4.4.9.</span> <span class="toc-text">找出程序运行的端口</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#显示网络接口列表"><span class="toc-number">1.2.4.4.10.</span> <span class="toc-text">显示网络接口列表</span></a></li></ol></li></ol></li></ol></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+  <div class="archiveslist">
+    <p class="asidetitle"><a href="/archives">归档</a></p>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">2</span></li></ul>
+  </div>
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/Elasticsearch/" title="Elasticsearch">Elasticsearch<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Hexo/" title="Hexo">Hexo<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Redis/" title="Redis">Redis<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/SSH/" title="SSH">SSH<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Token/" title="Token">Token<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/sar/" title="sar">sar<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Docker/" title="Docker">Docker<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/node/" title="node">node<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/git/" title="git">git<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/npm/" title="npm">npm<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/top/" title="top">top<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vmstat/" title="vmstat">vmstat<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Elasticsearch/" title="Elasticsearch">Elasticsearch<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/iostat/" title="iostat">iostat<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/netstat/" title="netstat">netstat<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/redis/" title="redis">redis<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/SDS/" title="SDS">SDS<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/SSH/" title="SSH">SSH<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/github/" title="github">github<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Token/" title="Token">Token<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/JWT/" title="JWT">JWT<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://blog.csdn.net/x1066988452" target="_blank" title="My CSDN">My CSDN</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://www.bridgeli.cn/" target="_blank" title="Denny&#39;s Blog">Denny&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=1868167451&verifier=3c2784f4&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> 人生若只如初见 <br/>
+			I fear that I will always be a lonely number like root three</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/1868167451" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		<a href="https://github.com/LeoDominicXu" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		<a href="http://www.zhihu.com/people/dominic-23" target="_blank" class="icon-zhihu" title="知乎"></a>
+		
+		
+		
+		<a href="mailto:xuzichao1991@163.com" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="Leo Dominic">Leo Dominic</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>
