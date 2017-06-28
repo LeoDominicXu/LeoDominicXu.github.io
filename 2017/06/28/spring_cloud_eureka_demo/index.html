@@ -4,24 +4,24 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>基于 Token 的身份验证 | Leo Dominic</title>
+    <title>Spring cloud Eureka | Leo Dominic</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Leo Dominic">
     
 
     
-    <meta name="description" content="基于 Token 的身份验证[转载]转载地址：链接 最近了解下基于 Token 的身份验证，跟大伙分享下。很多大型网站也都在用，比如 Facebook，Twitter，Google+，Github 等等，比起传统的身份验证方法，Token 扩展性更强，也更安全点，非常适合用在 Web 应用或者移动应用上。Token 的中文有人翻译成 “令牌”，我觉得挺好，意思就是，你拿着这个令牌，才能过一些关卡。">
-<meta name="keywords" content="Token,JWT">
+    <meta name="description" content="Eureka 服务注册中心 新建项目  选择Spring Initializr工具新建项目，然后选择Initializr Url：https://start.spring.io 填好项目基本信息，然后选择Cloud Discovery的Eureka Server即可新建Eureka Server的项目。 修改启动程序类 12345678@SpringBootApplication@EnableEu">
+<meta name="keywords" content="Spring cloud,Eureka">
 <meta property="og:type" content="article">
-<meta property="og:title" content="基于 Token 的身份验证">
-<meta property="og:url" content="http://yoursite.com/2017/05/18/token_signature/index.html">
+<meta property="og:title" content="Spring cloud Eureka">
+<meta property="og:url" content="http://yoursite.com/2017/06/28/spring_cloud_eureka_demo/index.html">
 <meta property="og:site_name" content="Leo Dominic">
-<meta property="og:description" content="基于 Token 的身份验证[转载]转载地址：链接 最近了解下基于 Token 的身份验证，跟大伙分享下。很多大型网站也都在用，比如 Facebook，Twitter，Google+，Github 等等，比起传统的身份验证方法，Token 扩展性更强，也更安全点，非常适合用在 Web 应用或者移动应用上。Token 的中文有人翻译成 “令牌”，我觉得挺好，意思就是，你拿着这个令牌，才能过一些关卡。">
-<meta property="og:updated_time" content="2017-05-18T14:29:47.038Z">
+<meta property="og:description" content="Eureka 服务注册中心 新建项目  选择Spring Initializr工具新建项目，然后选择Initializr Url：https://start.spring.io 填好项目基本信息，然后选择Cloud Discovery的Eureka Server即可新建Eureka Server的项目。 修改启动程序类 12345678@SpringBootApplication@EnableEu">
+<meta property="og:updated_time" content="2017-06-28T13:39:21.872Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="基于 Token 的身份验证">
-<meta name="twitter:description" content="基于 Token 的身份验证[转载]转载地址：链接 最近了解下基于 Token 的身份验证，跟大伙分享下。很多大型网站也都在用，比如 Facebook，Twitter，Google+，Github 等等，比起传统的身份验证方法，Token 扩展性更强，也更安全点，非常适合用在 Web 应用或者移动应用上。Token 的中文有人翻译成 “令牌”，我觉得挺好，意思就是，你拿着这个令牌，才能过一些关卡。">
+<meta name="twitter:title" content="Spring cloud Eureka">
+<meta name="twitter:description" content="Eureka 服务注册中心 新建项目  选择Spring Initializr工具新建项目，然后选择Initializr Url：https://start.spring.io 填好项目基本信息，然后选择Cloud Discovery的Eureka Server即可新建Eureka Server的项目。 修改启动程序类 12345678@SpringBootApplication@EnableEu">
 
     
     <link rel="alternative" href="/atom.xml" title="Leo Dominic" type="application/atom+xml">
@@ -85,14 +85,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2017/05/18/token_signature/" title="基于 Token 的身份验证" itemprop="url">基于 Token 的身份验证</a>
+      <a href="/2017/06/28/spring_cloud_eureka_demo/" title="Spring cloud Eureka" itemprop="url">Spring cloud Eureka</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Leo Dominic" target="_blank" itemprop="author">Leo Dominic</a>
 		
   <p class="article-time">
-    <time datetime="2017-05-18T02:07:37.000Z" itemprop="datePublished"> 发表于 2017-05-18</time>
+    <time datetime="2017-06-28T13:07:37.000Z" itemprop="datePublished"> 发表于 2017-06-28</time>
     
   </p>
 </header>
@@ -101,43 +101,72 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#基于-Token-的身份验证-转载"><span class="toc-number">1.</span> <span class="toc-text">基于 Token 的身份验证[转载]</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#传统身份验证的方法"><span class="toc-number">1.1.</span> <span class="toc-text">传统身份验证的方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#基于-Token-的身份验证方法"><span class="toc-number">1.2.</span> <span class="toc-text">基于 Token 的身份验证方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JWT"><span class="toc-number">1.3.</span> <span class="toc-text">JWT</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-Header"><span class="toc-number">1.3.1.</span> <span class="toc-text">1.Header</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Payload"><span class="toc-number">1.3.2.</span> <span class="toc-text">2.Payload</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-Signature"><span class="toc-number">1.3.3.</span> <span class="toc-text">3.Signature</span></a></li></ol></li></ol></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Eureka-服务注册中心"><span class="toc-number">1.</span> <span class="toc-text">Eureka 服务注册中心</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Eureka-服务提供者"><span class="toc-number">2.</span> <span class="toc-text">Eureka 服务提供者</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Eureka-服务消费者"><span class="toc-number">3.</span> <span class="toc-text">Eureka 服务消费者</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#结语"><span class="toc-number">4.</span> <span class="toc-text">结语</span></a></li></ol>
 		
 		</div>
 		
-		<h1 id="基于-Token-的身份验证-转载"><a href="#基于-Token-的身份验证-转载" class="headerlink" title="基于 Token 的身份验证[转载]"></a>基于 Token 的身份验证[转载]</h1><p>转载地址：<a href="https://ninghao.net/blog/2834" target="_blank" rel="external">链接</a></p>
-<p>最近了解下基于 Token 的身份验证，跟大伙分享下。很多大型网站也都在用，比如 Facebook，Twitter，Google+，Github 等等，比起传统的身份验证方法，Token 扩展性更强，也更安全点，非常适合用在 Web 应用或者移动应用上。Token 的中文有人翻译成 “令牌”，我觉得挺好，意思就是，你拿着这个令牌，才能过一些关卡。</p>
-<h2 id="传统身份验证的方法"><a href="#传统身份验证的方法" class="headerlink" title="传统身份验证的方法"></a>传统身份验证的方法</h2><p>HTTP 是一种没有状态的协议，也就是它并不知道是谁是访问应用。这里我们把用户看成是客户端，客户端使用用户名还有密码通过了身份验证，不过下回这个客户端再发送请求时候，还得再验证一下。</p>
-<p>解决的方法就是，当用户请求登录的时候，如果没有问题，我们在服务端生成一条记录，这个记录里可以说明一下登录的用户是谁，然后把这条记录的 ID 号发送给客户端，客户端收到以后把这个 ID 号存储在 Cookie 里，下次这个用户再向服务端发送请求的时候，可以带着这个 Cookie ，这样服务端会验证一个这个 Cookie 里的信息，看看能不能在服务端这里找到对应的记录，如果可以，说明用户已经通过了身份验证，就把用户请求的数据返回给客户端。</p>
-<p>上面说的就是 Session，我们需要在服务端存储为登录的用户生成的 Session ，这些 Session 可能会存储在内存，磁盘，或者数据库里。我们可能需要在服务端定期的去清理过期的 Session 。</p>
-<h2 id="基于-Token-的身份验证方法"><a href="#基于-Token-的身份验证方法" class="headerlink" title="基于 Token 的身份验证方法"></a>基于 Token 的身份验证方法</h2><p>使用基于 Token 的身份验证方法，在服务端不需要存储用户的登录记录。大概的流程是这样的：</p>
-<p>客户端使用用户名跟密码请求登录<br>服务端收到请求，去验证用户名与密码<br>验证成功后，服务端会签发一个 Token，再把这个 Token 发送给客户端<br>客户端收到 Token 以后可以把它存储起来，比如放在 Cookie 里或者 Local Storage 里<br>客户端每次向服务端请求资源的时候需要带着服务端签发的 Token<br>服务端收到请求，然后去验证客户端请求里面带着的 Token，如果验证成功，就向客户端返回请求的数据</p>
-<h2 id="JWT"><a href="#JWT" class="headerlink" title="JWT"></a>JWT</h2><p>实施 Token 验证的方法挺多的，还有一些标准方法，比如 JWT，读作：jot ，表示：JSON Web Tokens 。JWT 标准的 Token 有三个部分：<br>header<br>payload<br>signature<br>中间用点分隔开，并且都会使用 Base64 编码，所以真正的 Token 看起来像这样：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJuaW5naGFvLm5ldCIsImV4cCI6IjE0Mzg5NTU0NDUiLCJuYW1lIjoid2FuZ2hhbyIsImFkbWluIjp0cnVlfQ.SwyHTEx_RQppr97g4J5lKXtabJecpejuef8AqKYMAJc</div></pre></td></tr></table></figure></p>
-<h3 id="1-Header"><a href="#1-Header" class="headerlink" title="1.Header"></a>1.Header</h3><p>header 部分主要是两部分内容，一个是 Token 的类型，另一个是使用的算法，比如下面类型就是 JWT，使用的算法是 HS256。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  <span class="string">"typ"</span>: <span class="string">"JWT"</span>,</div><div class="line">  <span class="string">"alg"</span>: <span class="string">"HS256"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>上面的内容要用 Base64 的形式编码一下，所以就变成这样：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9</div></pre></td></tr></table></figure></p>
-<h3 id="2-Payload"><a href="#2-Payload" class="headerlink" title="2.Payload"></a>2.Payload</h3><p>Payload 里面是 Token 的具体内容，这些内容里面有一些是标准字段，你也可以添加其它需要的内容。下面是标准字段：</p>
-<p>iss：Issuer，发行者<br>sub：Subject，主题<br>aud：Audience，观众<br>exp：Expiration time，过期时间<br>nbf：Not before<br>iat：Issued at，发行时间<br>jti：JWT ID<br>比如下面这个 Payload ，用到了 iss 发行人，还有 exp 过期时间。另外还有两个自定义的字段，一个是 name ，还有一个是 admin 。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line"> <span class="string">"iss"</span>: <span class="string">"ninghao.net"</span>,</div><div class="line"> <span class="string">"exp"</span>: <span class="string">"1438955445"</span>,</div><div class="line"> <span class="string">"name"</span>: <span class="string">"wanghao"</span>,</div><div class="line"> <span class="string">"admin"</span>: <span class="literal">true</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>使用 Base64 编码以后就变成了这个样子：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">eyJpc3MiOiJuaW5naGFvLm5ldCIsImV4cCI6IjE0Mzg5NTU0NDUiLCJuYW1lIjoid2FuZ2hhbyIsImFkbWluIjp0cnVlfQ</div></pre></td></tr></table></figure></p>
-<h3 id="3-Signature"><a href="#3-Signature" class="headerlink" title="3.Signature"></a>3.Signature</h3><p>JWT 的最后一部分是 Signature ，这部分内容有三个部分，先是用 Base64 编码的 header.payload ，再用加密算法加密一下，加密的时候要放进去一个 Secret ，这个相当于是一个密码，这个密码秘密地存储在服务端。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">header</div><div class="line">payload</div><div class="line">secret</div><div class="line">var encodedString = base64UrlEncode(header) + <span class="string">"."</span> + base64UrlEncode(payload); </div><div class="line">HMACSHA256(encodedString, <span class="string">'secret'</span>);</div></pre></td></tr></table></figure></p>
-<p>处理完成以后看起来像这样：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">SwyHTEx_RQppr97g4J5lKXtabJecpejuef8AqKYMAJc</div></pre></td></tr></table></figure></p>
-<p>最后这个在服务端生成并且要发送给客户端的 Token 看起来像这样：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJuaW5naGFvLm5ldCIsImV4cCI6IjE0Mzg5NTU0NDUiLCJuYW1lIjoid2FuZ2hhbyIsImFkbWluIjp0cnVlfQ.SwyHTEx_RQppr97g4J5lKXtabJecpejuef8AqKYMAJc</div></pre></td></tr></table></figure></p>
-<p>客户端收到这个 Token 以后把它存储下来，下回向服务端发送请求的时候就带着这个 Token 。服务端收到这个 Token ，然后进行验证，通过以后就会返回给客户端想要的资源。</p>
-<p>相关链接</p>
-<p><a href="http://jwt.io/" target="_blank" rel="external">http://jwt.io/</a><br><a href="https://github.com/firebase/php-jwt" target="_blank" rel="external">https://github.com/firebase/php-jwt</a><br><a href="https://scotch.io/tutorials/the-anatomy-of-a-json-web-token" target="_blank" rel="external">https://scotch.io/tutorials/the-anatomy-of-a-json-web-token</a><br><a href="https://github.com/auth0/jwt-decode" target="_blank" rel="external">https://github.com/auth0/jwt-decode</a></p>
-  
+		<h1 id="Eureka-服务注册中心"><a href="#Eureka-服务注册中心" class="headerlink" title="Eureka 服务注册中心"></a>Eureka 服务注册中心</h1><ul>
+<li>新建项目<br>  选择Spring Initializr工具新建项目，然后选择Initializr Url：<a href="https://start.spring.io" target="_blank" rel="external">https://start.spring.io</a> 填好项目基本信息，然后选择Cloud Discovery的Eureka Server即可新建Eureka Server的项目。</li>
+<li><p>修改启动程序类</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">@SpringBootApplication</div><div class="line">@EnableEurekaServer</div><div class="line">public class EurekaServerApplication &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		SpringApplication.run(EurekaServerApplication.class, args);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>修改配置文件application.properties</p>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">server.port=1111</div><div class="line"></div><div class="line">eureka.instance.hostname=localhost</div><div class="line">eureka.client.register-with-eureka=<span class="literal">false</span></div><div class="line">eureka.client.fetch-registry=<span class="literal">false</span></div><div class="line">eureka.client.serviceUrl.defaultZone=http://<span class="variable">$&#123;eureka.instance.hostname&#125;</span>:<span class="variable">$&#123;server.port&#125;</span>/eureka/</div></pre></td></tr></table></figure>
+<blockquote>
+<p>eureka.client.register-with-eureka 由于该应用为注册中心，所以不需要向自己注册自己。<br>eureka.client.fetch-registry 由于注册中心的职责是维护服务实例，他并不需要去检查服务，所以也设置为false</p>
+</blockquote>
+<ul>
+<li>运行程序<br>  一个Eureka 服务端服务端程序便已创建完成了，接下来便可以通过浏览器访问<a href="http://localhost:1111/" target="_blank" rel="external">http://localhost:1111/</a> 访问服务，查看注册表信息。</li>
+</ul>
+<h1 id="Eureka-服务提供者"><a href="#Eureka-服务提供者" class="headerlink" title="Eureka 服务提供者"></a>Eureka 服务提供者</h1><ul>
+<li>新建项目<br>  选择Spring Initializr工具新建项目，然后选择Initializr Url：<a href="https://start.spring.io" target="_blank" rel="external">https://start.spring.io</a> 填好项目基本信息，然后选择Web的web模块和Cloud Discovery的Eureka Discovery模块即可新建Eureka 提供者的项目。</li>
+<li>修改启动程序类<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">@SpringBootApplication</div><div class="line">@EnableEurekaClient</div><div class="line">public class EurekaServerApplication &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		SpringApplication.run(EurekaServerApplication.class, args);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">@RestController</div><div class="line">public class HelloController &#123;</div><div class="line">    @RequestMapping(value = <span class="string">"/hello"</span>, method = RequestMethod.GET)</div><div class="line">    public String <span class="function"><span class="title">home</span></span>()&#123;</div><div class="line">        <span class="built_in">return</span> <span class="string">"Hello World"</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里@EnableEurekaClient也可以用：@EnableDiscoveryClient</p>
+<ul>
+<li>修改配置文件application.properties</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">spring.application.name=hello-service</div><div class="line">eureka.client.serviceUrl.defaultZone=http://localhost:1111/eureka/</div></pre></td></tr></table></figure>
+<ul>
+<li>运行程序<br>  一个Eureka 服务提供者程序便已创建完成了，接下来便可以通过浏览器访问<a href="http://localhost:1111/" target="_blank" rel="external">http://localhost:1111/</a> 访问服务，查看注册表信息。看服务有没有被注册上</li>
+</ul>
+<h1 id="Eureka-服务消费者"><a href="#Eureka-服务消费者" class="headerlink" title="Eureka 服务消费者"></a>Eureka 服务消费者</h1><ul>
+<li>新建项目<br>  和服务提供者一样</li>
+<li>修改启动程序类<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">@SpringBootApplication</div><div class="line">@EnableDiscoveryClient</div><div class="line">public class EurekaConsumerApplication &#123;</div><div class="line">	@Bean</div><div class="line">	@LoadBalanced</div><div class="line">	RestTemplate <span class="function"><span class="title">restTemplate</span></span>()&#123;</div><div class="line">		<span class="built_in">return</span> new RestTemplate();</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		SpringApplication.run(EurekaConsumerApplication.class, args);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">@RestController</div><div class="line">public class ConsumerController &#123;</div><div class="line">    @Resource</div><div class="line">    RestTemplate restTemplate;</div><div class="line"></div><div class="line">    @RequestMapping(value = <span class="string">"/ribbon-consumer"</span>,method = RequestMethod.GET)</div><div class="line">    public String <span class="function"><span class="title">helloConsumer</span></span>()&#123;</div><div class="line">        <span class="built_in">return</span> restTemplate.getForEntity(<span class="string">"http://HELLO-SERVICE/hello"</span>, String.class).getBody();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里@EnableEurekaClient也可以用：@EnableDiscoveryClient</p>
+<ul>
+<li>修改配置文件application.properties</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">spring.application.name=ribbon-consumer</div><div class="line">server.port=9000</div><div class="line">eureka.client.serviceUrl.defaultZone=http://localhost:1111/eureka/</div></pre></td></tr></table></figure>
+<blockquote>
+<p>由于8080端口已经被提供者占用，所以这里将端口改为9000</p>
+</blockquote>
+<ul>
+<li>运行程序<br>  一个Eureka 服务提供者程序便已创建完成了，接下来便可以通过浏览器访问<a href="http://localhost:1111/" target="_blank" rel="external">http://localhost:1111/</a> 访问服务，查看注册表信息。看服务有没有被注册上</li>
+<li>消费者调用提供者<br>  在浏览器输入<a href="http://localhost/ribbon-consumer" target="_blank" rel="external">http://localhost/ribbon-consumer</a> 看结果，如果页面显示hello world说明程序运行没有问题。</li>
+</ul>
+<h1 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h1><pre><code>到这里一个简单的Eureka 注册中心，服务提供者，服务消费者demo就完成了，感谢浏览。
+</code></pre>  
 	</div>
 		<footer class="article-footer clearfix">
 <div class="article-catetags">
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/Token/">Token</a>
+  <a class="article-category-link" href="/categories/Spring-cloud/">Spring cloud</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Token/">Token</a><a href="/tags/JWT/">JWT</a>
+  <span></span> <a href="/tags/Spring-cloud/">Spring cloud</a><a href="/tags/Eureka/">Eureka</a>
   </div>
 
 </div>
@@ -146,7 +175,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://yoursite.com/2017/05/18/token_signature/" data-title="基于 Token 的身份验证 | Leo Dominic" data-tsina="1868167451" class="share clearfix">
+	  <div data-url="http://yoursite.com/2017/06/28/spring_cloud_eureka_demo/" data-title="Spring cloud Eureka | Leo Dominic" data-tsina="1868167451" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -159,19 +188,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2017/06/27/dubbo_rest/" title="Dubbo Rest协议支持">
-  <strong>上一篇：</strong><br/>
-  <span>
-  Dubbo Rest协议支持</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2017/05/17/linux_command_performance/"  title="Linux性能检查工具">
+<a href="/2017/06/27/dubbo_rest/"  title="Dubbo Rest协议支持">
  <strong>下一篇：</strong><br/> 
- <span>Linux性能检查工具
+ <span>Dubbo Rest协议支持
 </span>
 </a>
 </div>
@@ -189,7 +210,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#基于-Token-的身份验证-转载"><span class="toc-number">1.</span> <span class="toc-text">基于 Token 的身份验证[转载]</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#传统身份验证的方法"><span class="toc-number">1.1.</span> <span class="toc-text">传统身份验证的方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#基于-Token-的身份验证方法"><span class="toc-number">1.2.</span> <span class="toc-text">基于 Token 的身份验证方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JWT"><span class="toc-number">1.3.</span> <span class="toc-text">JWT</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-Header"><span class="toc-number">1.3.1.</span> <span class="toc-text">1.Header</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Payload"><span class="toc-number">1.3.2.</span> <span class="toc-text">2.Payload</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-Signature"><span class="toc-number">1.3.3.</span> <span class="toc-text">3.Signature</span></a></li></ol></li></ol></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Eureka-服务注册中心"><span class="toc-number">1.</span> <span class="toc-text">Eureka 服务注册中心</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Eureka-服务提供者"><span class="toc-number">2.</span> <span class="toc-text">Eureka 服务提供者</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Eureka-服务消费者"><span class="toc-number">3.</span> <span class="toc-text">Eureka 服务消费者</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#结语"><span class="toc-number">4.</span> <span class="toc-text">结语</span></a></li></ol>
  
   </div>
 
